@@ -20,7 +20,7 @@ spec:
         app: projector-backend
     spec:
       containers:
-      - image: cr.io/GOOGLE_CLOUD_PROJECT/projector-be:COMMIT_SHA
+      - image: gcr.io/GOOGLE_CLOUD_PROJECT/projector-be:COMMIT_SHA
         name: projector-be
         ports:
         - containerPort: 5000
