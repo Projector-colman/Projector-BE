@@ -27,7 +27,6 @@ run linters, setup and tests
 FROM dependencies AS test
 COPY . .
 # RUN  npm run lint && npm run setup && npm run test
-RUN  npm run setup
 
 #
 # ---- Release ----
