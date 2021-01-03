@@ -37,4 +37,4 @@ COPY --from=dependencies /root/chat/prod_node_modules ./node_modules
 COPY . .
 # expose port and define CMD
 EXPOSE 5000
-CMD npm run start
+CMD npm run src/server.ts
