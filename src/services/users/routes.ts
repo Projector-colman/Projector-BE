@@ -6,8 +6,8 @@ export default [
         path: "/users",
         method: "get",
         handler: async (req: Request, res: Response, next: NextFunction) => {
-          const data = 'hello world';
-          res.send(data);
+          const username = await controller.getUser(req.query.username);
+          res.send(username);
         }
       },
 ];
