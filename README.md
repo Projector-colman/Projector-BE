@@ -1,36 +1,14 @@
-# Projector-BE
+# PROJECTOR
 ----
-User:  
-    id      [PK]  
-    name  
-    email   [UK]  
-    password  
-    isAdmin  
-Project:  
-    id                  [PK]  
-    name                [UK]  
-    owner (User.id)     [FK]  
-Epic:  
-    id                      [PK]  
-    name  
-    project (Project.id)    [FK]  
-    reporter (User.id)      [FK]  
-    asignee (User.id)       [FK]  
-    description  
-Issue:  
-    id                      [PK]  
-    name  
-    epic (Project.id)       [FK]  
-    reporter (User.id)      [FK]  
-    asignee (User.id)       [FK]  
-    description  
-    Priority    (Enum ?)  
-    storyPoints  
-    sprint (Sprint.id)      [FK]  
-Sprint:  
-    id                      [PK]  
-    startTime  
-    project (Project.id)    [FK]  
-Linked Issues:  
-    blocker_issue (Issue.id)  
-    blocked_issue (Issue.id)  
+This is the backend side of the Projector Project.
+----
+To start work with the server API:  
+
+* Register:  
+POST `/api/users` with name, email and password  
+* Authenticate:  
+POST `/api/auth`  with name and password  
+
+Start creating objects with this server's API:  
+* Projects: /api/projects
+* Epics: /api/epics
