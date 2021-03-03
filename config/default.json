@@ -1,0 +1,9 @@
+{
+  "name": "Projector Backend",
+  "port": 3000,
+  "postgres-server": "35.226.162.29",
+  "db-name": "projector",
+  "postgres-user": "projector",
+  "postgres-pass": "project0r",
+  "jwtPrivateKey": "spoon_jwtPrivateKey"
+}
