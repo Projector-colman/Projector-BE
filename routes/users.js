@@ -7,15 +7,14 @@ const admin = require('../middleware/admin');
 const router = express.Router();
 
 // // Get my details.
-// router.get('/me', auth, async (req, res) => {
-//     const user = await User.findById(req.user._id).select('-password');
-//     res.send(user);
-// });
+router.get('/me', auth, async (req, res) => {
+    const user = await User.findByPk(req.user.id, { attributes: { exclude: ['password'] } });
+    res.send(user);
+});
 
 // Get all users:
 // Only Admin can get all the users.
-// router.get('/', [ auth, admin ], async (req, res) => {
-router.get('/', async (req, res) => {
+router.get('/', [ auth, admin ], async (req, res) => {
     const users = await User.findAll();
     res.send(users);
 });
@@ -41,8 +40,7 @@ router.post('/', async (req, res) => {
     });
 
     const token = user.generateAuthToken();
-    res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']));
-    // res.send(_.pick(user, ['_id', 'name', 'email']));
+    res.header('x-auth-token', token).send(_.pick(user, ['id', 'name', 'email']));
 });
 
 module.exports = router;

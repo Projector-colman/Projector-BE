@@ -13,7 +13,7 @@ class User extends Model {
     );
     return token;
   };
-}
+};
 
 User.init({
   // Model attributes are defined here
@@ -31,7 +31,8 @@ User.init({
   },
   isAdmin: {
     type: DataTypes.BOOLEAN,
-    allowNull: true
+    allowNull: false,
+    defaultValue: false
   }
 }, {
   sequelize: db,
@@ -45,7 +46,6 @@ function validateUser(user) {
     name: Joi.string().min(2).max(50).required(),
     email: Joi.string().min(5).max(255).required().email(),
     password: Joi.string().min(5).max(255).required(),
-    // isAdmin: Joi.required()
   });
 
   return schema.validate(user);

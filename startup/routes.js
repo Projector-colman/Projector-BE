@@ -6,7 +6,7 @@ const error = require('../middleware/error');
 
 // Routers
 const homeRouter = require('../routes/home');
-// const recipeRouter = require('../routes/recipes');
+const projectRouter = require('../routes/projects');
 // const categoryRouter = require('../routes/categories');
 const userRouter = require('../routes/users');
 const authRouter = require('../routes/auth');
@@ -20,6 +20,7 @@ module.exports = function(app) {
         .use('/', homeRouter)
         .use('/api/users', userRouter)
         .use('/api/auth', authRouter)
+        .use('/api/projects', projectRouter)
         // Error middleware has to be last.
         .use(error);
 }
