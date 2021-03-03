@@ -12,7 +12,7 @@ Project.init({
     type: DataTypes.STRING,
     allowNull: false
   },
-  ownerID: {
+  owner: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -29,7 +29,7 @@ Project.init({
 // User validation.
 function validateUser(project) {
   const schema = Joi.object({
-    name: Joi.string().min(2).max(50).required(),
+    name: Joi.string().min(2).max(255).required()
   });
 
   return schema.validate(project);

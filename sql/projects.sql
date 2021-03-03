@@ -6,12 +6,12 @@ CREATE TABLE public.projects
 (
     id integer NOT NULL DEFAULT nextval('projects_id_seq'::regclass),
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    "ownerID" integer NOT NULL,
+    owner integer NOT NULL,
     "createdAt" date,
     "updatedAt" date,
     CONSTRAINT projects_pkey PRIMARY KEY (id),
     CONSTRAINT name_uqky UNIQUE (name),
-    CONSTRAINT owner_id FOREIGN KEY ("ownerID")
+    CONSTRAINT owner_id FOREIGN KEY (owner)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION

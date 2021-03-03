@@ -1,9 +1,7 @@
 const express = require('express');
 const _ = require('lodash');
-const bcrypt = require('bcrypt');
 const { Project, validate } = require('../models/project');
 const auth = require('../middleware/auth');
-const admin = require('../middleware/admin');
 const router = express.Router();
 
 // Get all projects
@@ -24,13 +22,13 @@ router.post('/', auth, async (req, res) => {
     let project = await Project.findOne({ where: { name: name }});
     if (project) return res.status(400).send('Project with this name is already exists');
 
-    const ownerID = req.user.id;
+    const owner = req.user.id;
     project = await Project.create({
         name,
-        ownerID
+        owner
     });
 
-    res.status(200).send(_.pick(project, ['id', 'name', 'ownerID']));
+    res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
 })
 
 // Delete a project
@@ -41,6 +39,9 @@ router.delete('/', auth, async (req, res) => {
 
     let project = await Project.findByPk(req.body.id);
     if (!project) return res.status(400).send('Project does not exist.');
+
+    // If this is not the owner, don't delete.
+    if (project.owner != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     await Project.destroy({
         where: {
