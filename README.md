@@ -1,6 +1,7 @@
 # PROJECTOR
 ----
-This is the backend side of the Projector Project.
+This is the backend side of the Projector Project.  
+Projector is an Opensource Project management tools, that helps you manage your teams/company.
 
 ----
 ## Start working with the server's API:  
