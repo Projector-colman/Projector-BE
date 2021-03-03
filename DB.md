@@ -20,17 +20,18 @@ Epic:
 Issue:  
     id                      [PK]  
     name  
+    description  
     epic (Project.id)       [FK]  
     reporter (User.id)      [FK]  
     asignee (User.id)       [FK]  
-    description  
-    Priority    (Enum ?)  
     storyPoints  
+    Priority    (Enum ?)  
     sprint (Sprint.id)      [FK]  
 Sprint:  
     id                      [PK]  
     startTime  
     project (Project.id)    [FK]  
 Linked Issues:  
-    blocker_issue (Issue.id)  
-    blocked_issue (Issue.id)  
+    id                          [PK]
+    blocker_issue (Issue.id)    [FK]
+    blocked_issue (Issue.id)    [FK]
