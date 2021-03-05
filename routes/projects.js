@@ -40,7 +40,7 @@ router.put('/', auth, async (req, res) => {
     let project = await Project.findByPk(req.body.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
-    // If this is not the owner, don't delete.
+    // If this is not the owner, don't update.
     if (project.owner != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     let { name } = _.pick(req.body, ['name']);

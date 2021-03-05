@@ -35,6 +35,35 @@ router.post('/', auth, async (req, res) => {
     res.status(200).send(_.pick(epic, ['id', 'name', 'description', 'project', 'reporter', 'asignee']));
 })
 
+// Update an epic
+// Only Owner of the epic.
+router.put('/', auth, async (req, res) => {
+    epicId = _.pick(req.body, ['id']);
+    if (!epicId) return res.status(400).send('Got no epic ID to update.');
+
+    let epic = await Epic.findByPk(req.body.id);
+    if (!epic) return res.status(400).send('Epic does not exist.');
+
+    // If this is not the owner, don't update.
+    if (epic.reporter != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    // Should we change reporter also ?
+    let { name, description, project, asignee } = _.pick(req.body, ['name', 'description', 'project', 'asignee']);
+
+    await Epic.update(
+        { 
+            name: name,
+            description: description,
+            project: project,
+            asignee: asignee
+        },
+        { where: { id: req.body.id }});
+
+    epic = await Epic.findByPk(req.body.id);
+
+    res.status(200).send(_.pick(epic, ['id', 'name', 'description', 'project', 'reporter', 'asignee']));
+});
+
 // Delete an epic
 // Only the owner
 router.delete('/', auth, async (req, res) => {
