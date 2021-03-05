@@ -112,6 +112,12 @@ function validateIssue(issue) {
   return schema.validate(issue);
 }
 
+function validateStatus(status) {
+  const schema = Joi.string().valid('to-do', 'in-progress', 'verify', 'done');
+  return schema.validate(status);
+}
+
 // Exports
 module.exports.Issue = Issue;
 module.exports.validate = validateIssue;
+module.exports.validateStatus = validateStatus;

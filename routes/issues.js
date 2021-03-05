@@ -1,6 +1,6 @@
 const express = require('express');
 const _ = require('lodash');
-const { Issue, validate } = require('../models/issue');
+const { Issue, validate, validateStatus } = require('../models/issue');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
@@ -86,5 +86,21 @@ router.delete('/:id', auth, async (req, res) => {
 
     res.status(200).send(_.pick(issue, ['name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']));
 });
+
+// Extra routes
+
+// Get all issues with a spesific status
+// Everyone can get it.
+router.get('/status/:status', async (req, res) => {
+    const { error } = validateStatus(req.params.status);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const issues = await Issue.findAll(
+        { where: { status: req.params.status }},    
+        { order: [[ 'name', 'ASC' ]] }
+    );
+    res.send(issues);
+});
+
 
 module.exports = router;
