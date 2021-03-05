@@ -5,11 +5,12 @@ const morgan = require('morgan');
 const error = require('../middleware/error');
 
 // Routers
+const userRouter = require('../routes/users');
+const authRouter = require('../routes/auth');
 const homeRouter = require('../routes/home');
 const projectRouter = require('../routes/projects');
 const epicRouter = require('../routes/epics');
-const userRouter = require('../routes/users');
-const authRouter = require('../routes/auth');
+const issueRouter = require('../routes/issues');
 
 module.exports = function(app) {
     app
@@ -17,11 +18,12 @@ module.exports = function(app) {
         .use(express.urlencoded({ extended: true }))
         .use(express.static('public'))
         .use(morgan('tiny'))
-        .use('/', homeRouter)
         .use('/api/users', userRouter)
         .use('/api/auth', authRouter)
+        .use('/', homeRouter)
         .use('/api/projects', projectRouter)
         .use('/api/epics', epicRouter)
+        .use('/api/issues', issueRouter)
         // Error middleware has to be last.
         .use(error);
 }
