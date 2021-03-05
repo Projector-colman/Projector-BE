@@ -17,7 +17,7 @@ router.post('/', auth, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    let { name, description, epic, asignee, storyPoints, priority, sprint } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint']);
+    let { name, description, epic, asignee, storyPoints, priority, sprint, status } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']);
 
     // Same name for two issues in the same epic is not allowed
     let issue = await Issue.findOne({ where: { name: name, epic: epic }});
@@ -32,10 +32,11 @@ router.post('/', auth, async (req, res) => {
         asignee,
         storyPoints,
         priority,
-        sprint
+        sprint,
+        status
     });
 
-    res.status(200).send(_.pick(issue, ['id', 'name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint']));
+    res.status(200).send(_.pick(issue, ['id', 'name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']));
 })
 
 // Update an issue
@@ -48,7 +49,7 @@ router.put('/:id', auth, async (req, res) => {
     if (issue.reporter != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     // Should we change reporter also ?
-    let { name, description, epic, asignee, storyPoints, priority, sprint } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint']);
+    let { name, description, epic, asignee, storyPoints, priority, sprint, status } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']);
 
     await Issue.update(
         { 
@@ -58,13 +59,14 @@ router.put('/:id', auth, async (req, res) => {
             asignee: asignee,
             storyPoints: storyPoints,
             priority: priority,
-            sprint: sprint
+            sprint: sprint,
+            status: status
         },
         { where: { id: req.params.id }});
 
     issue = await Issue.findByPk(req.params.id);
 
-    res.status(200).send(_.pick(issue, ['name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint']));
+    res.status(200).send(_.pick(issue, ['name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']));
 });
 
 // Delete an issue
@@ -82,7 +84,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
     });
 
-    res.status(200).send(_.pick(issue, ['name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint']));
+    res.status(200).send(_.pick(issue, ['name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']));
 });
 
 module.exports = router;

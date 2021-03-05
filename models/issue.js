@@ -84,6 +84,11 @@ Issue.init({
         isInt: true, // checks for valid integers
         min: 1, // only allow values >= 1
     },
+  },
+  status: {
+    type: DataTypes.ENUM('to-do', 'in-progress', 'verify', 'done'),
+    allowNull: true, // will allow null
+    defaultValue: 'to-do'
   }
 }, {
   sequelize: db,
@@ -101,6 +106,7 @@ function validateIssue(issue) {
     storyPoints: Joi.number(),
     priority: Joi.number(),
     sprint: Joi.number(),
+    status: Joi.string().valid('to-do', 'in-progress', 'verify', 'done'),
   });
 
   return schema.validate(issue);

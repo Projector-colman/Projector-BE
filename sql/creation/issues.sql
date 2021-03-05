@@ -13,6 +13,7 @@ CREATE TABLE public.issues
     "storyPoints" integer,
     priority integer,
     sprint integer,
+    status character varying COLLATE pg_catalog."default" NOT NULL,
     "createdAt" date,
     "updatedAt" date,
     CONSTRAINT issues_pkey PRIMARY KEY (id),
