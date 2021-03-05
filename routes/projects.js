@@ -31,6 +31,29 @@ router.post('/', auth, async (req, res) => {
     res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
 })
 
+// Update a project
+// Only Owner of the project.
+router.put('/', auth, async (req, res) => {
+    projectId = _.pick(req.body, ['id']);
+    if (!projectId) return res.status(400).send('Got no project ID to update.');
+
+    let project = await Project.findByPk(req.body.id);
+    if (!project) return res.status(400).send('Project does not exist.');
+
+    // If this is not the owner, don't delete.
+    if (project.owner != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    let { name } = _.pick(req.body, ['name']);
+
+    await Project.update(
+        { name: name },
+        { where: { id: req.body.id }});
+
+    project = await Project.findByPk(req.body.id);
+
+    res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
+});
+
 // Delete a project
 // Only the owner
 router.delete('/', auth, async (req, res) => {
@@ -48,7 +71,8 @@ router.delete('/', auth, async (req, res) => {
           id: req.body.id
         }
       })
-    res.send(project);
+
+    res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
 });
 
 module.exports = router;

@@ -19,26 +19,25 @@ User.init({
   // Model attributes are defined here
   name: {
     type: DataTypes.STRING,
+    allowNull: false, // won't allow null
     validate: {
-      isAlpha: true, // Will only allow letters
       notEmpty: true, // don't allow empty strings
-      notNull: true, // won't allow null
       len: [2, 255], // only allow values with length between 2 and 255
     }
   },
   email: {
     type: DataTypes.STRING,
+    allowNull: false, // won't allow null
     validate: {
       isEmail: true, // checks for email format (foo@bar.com)
-      notNull: true, // won't allow null
       len: [5, 255], // only allow values with length between 5 and 255
     }
   },
   password: {
     type: DataTypes.STRING,
+    allowNull: false, // won't allow null
     validate: {
       notEmpty: true, // don't allow empty strings
-      notNull: true, // won't allow null
       len: [5, 255], // only allow values with length between 5 and 255
     }
   },
