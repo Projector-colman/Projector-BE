@@ -2,6 +2,7 @@ const express = require('express');
 const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const { User, validate } = require('../models/user');
+const { Issue } = require('../models/issue');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const router = express.Router();
@@ -95,6 +96,32 @@ router.delete('/:id', auth, async (req, res) => {
     });
 
     res.status(200).send(_.pick(user, ['id', 'name', 'email']));
+});
+
+// Extra Routes
+
+// Get all reporetd issues of a user
+router.get('/:id/issues/reported', auth, async (req, res) => {
+    let user = await User.findByPk(req.params.id);
+    if (!user) return res.status(400).send('User does not exist.');
+
+    const issues = await Issue.findAll({ 
+        where: { reporter: user.id },
+        order: [[ 'name', 'ASC' ]] 
+    });
+    res.send(issues);
+});
+
+// Get all assigned issues of a user
+router.get('/:id/issues/assigned', auth, async (req, res) => {
+    let user = await User.findByPk(req.params.id);
+    if (!user) return res.status(400).send('User does not exist.');
+
+    const issues = await Issue.findAll({ 
+        where: { asignee: user.id },
+        order: [[ 'name', 'ASC' ]] 
+    });
+    res.send(issues);
 });
 
 module.exports = router;

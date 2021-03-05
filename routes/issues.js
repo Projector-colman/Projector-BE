@@ -26,8 +26,8 @@ router.post('/', auth, async (req, res) => {
     const reporter = req.user.id;
     issue = await Issue.create({
         name,
-        description,
         epic,
+        description,
         reporter,
         asignee,
         storyPoints,
