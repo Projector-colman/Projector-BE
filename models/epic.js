@@ -10,14 +10,29 @@ Epic.init({
   // Model attributes are defined here
   name: {
     type: DataTypes.STRING,
-    allowNull: false
+    validate: {
+      isAlpha: true, // Will only allow letters
+      notEmpty: true, // don't allow empty strings
+      notNull: true, // won't allow null
+      len: [2, 255], // only allow values with length between 2 and 255
+    }
   },
   description: {
     type: DataTypes.STRING,
+    validate: {
+      isAlpha: true, // will only allow letters
+      notEmpty: true, // don't allow empty strings
+      notNull: false, // allow null
+      len: [0, 255], // only allow values with length between 0 and 255
+    }
   },
   project: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    validate: {
+      notNull: true, // won't allow null
+      isInt: true, // checks for valid integers
+      min: 1, // only allow values >= 1
+    },
     references: {
         model: Project,
         key: 'id'
@@ -25,7 +40,11 @@ Epic.init({
   },
   reporter: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    validate: {
+      notNull: true, // won't allow null
+      isInt: true, // checks for valid integers
+      min: 1, // only allow values >= 1
+    },
     references: {
         model: User,
         key: 'id'
@@ -33,6 +52,11 @@ Epic.init({
   },
   asignee: {
     type: DataTypes.INTEGER,
+    validate: {
+      notNull: false, // allow null
+      isInt: true, // checks for valid integers
+      min: 1, // only allow values >= 1
+    },
     references: {
         model: User,
         key: 'id'

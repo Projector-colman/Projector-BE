@@ -10,11 +10,20 @@ Project.init({
   // Model attributes are defined here
   name: {
     type: DataTypes.STRING,
-    allowNull: false
+    validate: {
+      isAlpha: true, // Will only allow letters
+      notEmpty: true, // don't allow empty strings
+      notNull: true, // won't allow null
+      len: [2, 255], // only allow values with length between 2 and 255
+    }
   },
   owner: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    validate: {
+      notNull: true, // won't allow null
+      isInt: true, // checks for valid integers
+      min: 1, // only allow values >= 1
+    },
     references: {
         model: User,
         key: 'id'
