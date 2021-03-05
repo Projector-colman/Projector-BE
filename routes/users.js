@@ -101,7 +101,7 @@ router.delete('/:id', auth, async (req, res) => {
 // Extra Routes
 
 // Get all reporetd issues of a user
-router.get('/:id/issues/reported', auth, async (req, res) => {
+router.get('/:id/issues/reporter', auth, async (req, res) => {
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
@@ -113,7 +113,7 @@ router.get('/:id/issues/reported', auth, async (req, res) => {
 });
 
 // Get all assigned issues of a user
-router.get('/:id/issues/assigned', auth, async (req, res) => {
+router.get('/:id/issues/assignee', auth, async (req, res) => {
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
