@@ -1,12 +1,12 @@
 const Joi = require('joi');
 const { DataTypes, Model } = require('sequelize');
 const db = require('../startup/db');
-const { Project } = require('./project');
+const { Epic } = require('./epic');
 const { User } = require("./user");
 
-class Epic extends Model {};
+class Issue extends Model {};
 
-Epic.init({
+Issue.init({
   // Model attributes are defined here
   name: {
     type: DataTypes.STRING,
@@ -24,7 +24,7 @@ Epic.init({
       len: [0, 255], // only allow values with length between 0 and 255
     }
   },
-  project: {
+  epic: {
     type: DataTypes.INTEGER,
     allowNull: false, // won't allow null
     validate: {
@@ -32,7 +32,7 @@ Epic.init({
       min: 1, // only allow values >= 1
     },
     references: {
-        model: Project,
+        model: Epic,
         key: 'id'
     }
   },
@@ -59,25 +59,53 @@ Epic.init({
         model: User,
         key: 'id'
     }
+  },
+  storyPoints: {
+    type: DataTypes.INTEGER,
+    allowNull: true, // will allow null
+    validate: {
+      isInt: true, // checks for valid integers
+      min: 1, // only allow values >= 1
+    },
+  },
+  priority: {
+    type: DataTypes.INTEGER,
+    allowNull: true, // will allow null
+    validate: {
+      isInt: true, // checks for valid integers
+      min: 1, // only allow values >= 1
+      max: 5, // only allow values <= 5
+    },
+  },
+  sprint: { // This should be reference to Sprint Object.
+    type: DataTypes.INTEGER,
+    allowNull: true, // will allow null
+    validate: {
+        isInt: true, // checks for valid integers
+        min: 1, // only allow values >= 1
+    },
   }
 }, {
   sequelize: db,
-  modelName: 'Epic',
-  tableName: 'epics'
+  modelName: 'Issue',
+  tableName: 'issues'
 });
 
 // Object validation.
-function validateEpic(epic) {
+function validateIssue(issue) {
   const schema = Joi.object({
     name: Joi.string().min(2).max(255).required(),
     description: Joi.string().max(255),
-    project: Joi.number().required(),
+    epic: Joi.number().required(),
     asignee: Joi.number(),
+    storyPoints: Joi.number(),
+    priority: Joi.number(),
+    sprint: Joi.number(),
   });
 
-  return schema.validate(epic);
+  return schema.validate(issue);
 }
 
 // Exports
-module.exports.Epic = Epic;
-module.exports.validate = validateEpic;
+module.exports.Issue = Issue;
+module.exports.validate = validateIssue;

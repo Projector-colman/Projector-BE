@@ -34,8 +34,8 @@ Project.init({
   tableName: 'projects'
 });
 
-// User validation.
-function validateUser(project) {
+// Object validation.
+function validateProject(project) {
   const schema = Joi.object({
     name: Joi.string().min(2).max(255).required()
   });
@@ -45,4 +45,4 @@ function validateUser(project) {
 
 // Exports
 module.exports.Project = Project;
-module.exports.validate = validateUser;
+module.exports.validate = validateProject;
