@@ -80,8 +80,9 @@ router.delete('/', auth, async (req, res) => {
         where: {
           id: req.body.id
         }
-      })
-    res.send(epic);
+    });
+
+    res.status(200).send(_.pick(epic, ['id', 'name', 'description', 'project', 'reporter', 'asignee']));
 });
 
 module.exports = router;

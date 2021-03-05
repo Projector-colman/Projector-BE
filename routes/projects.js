@@ -70,7 +70,7 @@ router.delete('/', auth, async (req, res) => {
         where: {
           id: req.body.id
         }
-      })
+    });
 
     res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
 });

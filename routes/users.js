@@ -43,4 +43,56 @@ router.post('/', async (req, res) => {
     res.header('x-auth-token', token).send(_.pick(user, ['id', 'name', 'email']));
 });
 
+// Update a user:
+// Only the user itself.
+router.put('/', async (req, res) => {
+    const { error } = validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    let user = await User.findOne({ where: { email: req.body.email }});
+    if (!user) return res.status(400).send('User does not exist.');
+
+    // If this is not the user, don't update.
+    if (req.body.id != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    let { name, email, password } = _.pick(req.body, ['name', 'email', 'password']);
+    
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    password = await bcrypt.hash(password, salt);
+
+    await User.update(
+        { 
+            name: name,
+            email: email,
+            password: password
+        },
+        { where: { id: req.body.id }});
+
+    user = await User.findByPk(req.body.id);
+
+    res.send(_.pick(user, ['id', 'name', 'email']));
+});
+
+// Delete a user
+// Only the owner - (Maybe admin too ? -> TODO)
+router.delete('/', auth, async (req, res) => {
+    userId = _.pick(req.body, ['id']);
+    if (!userId) return res.status(400).send('Got no user ID to delete.');
+
+    let user = await User.findByPk(req.body.id);
+    if (!user) return res.status(400).send('User does not exist.');
+
+    // If this is not the owner, don't delete.
+    if (userId != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    await User.destroy({
+        where: {
+          id: userId
+        }
+    });
+
+    res.status(200).send(_.pick(user, ['id', 'name', 'email']));
+});
+
 module.exports = router;
