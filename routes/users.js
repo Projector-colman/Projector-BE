@@ -45,18 +45,23 @@ router.post('/', async (req, res) => {
 
 // Update a user:
 // Only the user itself.
-router.put('/', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    let user = await User.findOne({ where: { email: req.body.email }});
+    console.log(req.params.id);
+    let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
     // If this is not the user, don't update.
-    if (req.body.id != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    if (req.params.id != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     let { name, email, password } = _.pick(req.body, ['name', 'email', 'password']);
     
+    // If email already exists anywhere in the system.
+    let userWithEmail = await User.findOne({ where: { email: email }});
+    if (userWithEmail) return res.status(400).send('Email already exists in another user.');
+
     // Hash the password
     const salt = await bcrypt.genSalt(10);
     password = await bcrypt.hash(password, salt);
@@ -67,28 +72,25 @@ router.put('/', async (req, res) => {
             email: email,
             password: password
         },
-        { where: { id: req.body.id }});
+        { where: { id: req.params.id }});
 
-    user = await User.findByPk(req.body.id);
+    user = await User.findByPk(req.params.id);
 
     res.send(_.pick(user, ['id', 'name', 'email']));
 });
 
 // Delete a user
 // Only the owner - (Maybe admin too ? -> TODO)
-router.delete('/', auth, async (req, res) => {
-    userId = _.pick(req.body, ['id']);
-    if (!userId) return res.status(400).send('Got no user ID to delete.');
-
-    let user = await User.findByPk(req.body.id);
+router.delete('/:id', auth, async (req, res) => {
+    let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
     // If this is not the owner, don't delete.
-    if (userId != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    if (req.params.id != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     await User.destroy({
         where: {
-          id: userId
+          id: req.params.id
         }
     });
 

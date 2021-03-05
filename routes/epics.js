@@ -37,11 +37,8 @@ router.post('/', auth, async (req, res) => {
 
 // Update an epic
 // Only Owner of the epic.
-router.put('/', auth, async (req, res) => {
-    epicId = _.pick(req.body, ['id']);
-    if (!epicId) return res.status(400).send('Got no epic ID to update.');
-
-    let epic = await Epic.findByPk(req.body.id);
+router.put('/:id', auth, async (req, res) => {
+    let epic = await Epic.findByPk(req.params.id);
     if (!epic) return res.status(400).send('Epic does not exist.');
 
     // If this is not the owner, don't update.
@@ -57,20 +54,17 @@ router.put('/', auth, async (req, res) => {
             project: project,
             asignee: asignee
         },
-        { where: { id: req.body.id }});
+        { where: { id: req.params.id }});
 
-    epic = await Epic.findByPk(req.body.id);
+    epic = await Epic.findByPk(req.params.id);
 
     res.status(200).send(_.pick(epic, ['id', 'name', 'description', 'project', 'reporter', 'asignee']));
 });
 
 // Delete an epic
 // Only the owner
-router.delete('/', auth, async (req, res) => {
-    epicId = _.pick(req.body, ['id']);
-    if (!epicId) return res.status(400).send('Got no epic ID to delete.');
-
-    let epic = await Epic.findByPk(req.body.id);
+router.delete('/:id', auth, async (req, res) => {
+    let epic = await Epic.findByPk(req.params.id);
     if (!epic) return res.status(400).send('Epic does not exist.');
 
     // If this is not the owner, don't delete.
@@ -78,7 +72,7 @@ router.delete('/', auth, async (req, res) => {
 
     await Epic.destroy({
         where: {
-          id: req.body.id
+          id: req.params.id
         }
     });
 

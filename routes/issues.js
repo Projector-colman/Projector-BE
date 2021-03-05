@@ -40,11 +40,8 @@ router.post('/', auth, async (req, res) => {
 
 // Update an issue
 // Only Owner of the issue.
-router.put('/', auth, async (req, res) => {
-    issueId = _.pick(req.body, ['id']);
-    if (!issueId) return res.status(400).send('Got no issue ID to update.');
-
-    let issue = await Issue.findByPk(req.body.id);
+router.put('/:id', auth, async (req, res) => {
+    let issue = await Issue.findByPk(req.params.id);
     if (!issue) return res.status(400).send('Issue does not exist.');
 
     // If this is not the owner, don't update.
@@ -63,20 +60,17 @@ router.put('/', auth, async (req, res) => {
             priority: priority,
             sprint: sprint
         },
-        { where: { id: req.body.id }});
+        { where: { id: req.params.id }});
 
-    issue = await Issue.findByPk(req.body.id);
+    issue = await Issue.findByPk(req.params.id);
 
     res.status(200).send(_.pick(issue, ['name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint']));
 });
 
 // Delete an issue
 // Only the owner
-router.delete('/', auth, async (req, res) => {
-    issueId = _.pick(req.body, ['id']);
-    if (!issueId) return res.status(400).send('Got no issue ID to delete.');
-
-    let issue = await Issue.findByPk(req.body.id);
+router.delete('/:id', auth, async (req, res) => {
+    let issue = await Issue.findByPk(req.params.id);
     if (!issue) return res.status(400).send('Issue does not exist.');
 
     // If this is not the owner, don't delete.
@@ -84,7 +78,7 @@ router.delete('/', auth, async (req, res) => {
 
     await Issue.destroy({
         where: {
-          id: req.body.id
+          id: req.params.id
         }
     });
 

@@ -33,11 +33,8 @@ router.post('/', auth, async (req, res) => {
 
 // Update a project
 // Only Owner of the project.
-router.put('/', auth, async (req, res) => {
-    projectId = _.pick(req.body, ['id']);
-    if (!projectId) return res.status(400).send('Got no project ID to update.');
-
-    let project = await Project.findByPk(req.body.id);
+router.put('/:id', auth, async (req, res) => {
+    let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
     // If this is not the owner, don't update.
@@ -47,20 +44,17 @@ router.put('/', auth, async (req, res) => {
 
     await Project.update(
         { name: name },
-        { where: { id: req.body.id }});
+        { where: { id: req.params.id }});
 
-    project = await Project.findByPk(req.body.id);
+    project = await Project.findByPk(req.params.id);
 
     res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
 });
 
 // Delete a project
 // Only the owner
-router.delete('/', auth, async (req, res) => {
-    projectId = _.pick(req.body, ['id']);
-    if (!projectId) return res.status(400).send('Got no project ID to delete.');
-
-    let project = await Project.findByPk(req.body.id);
+router.delete('/:id', auth, async (req, res) => {
+    let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
     // If this is not the owner, don't delete.
@@ -68,7 +62,7 @@ router.delete('/', auth, async (req, res) => {
 
     await Project.destroy({
         where: {
-          id: req.body.id
+          id: req.params.id
         }
     });
 
