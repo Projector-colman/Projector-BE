@@ -1,6 +1,10 @@
 -- Table: public.epics
 
--- DROP TABLE public.epics;
+CREATE SEQUENCE epics_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE;
 
 CREATE TABLE public.epics
 (

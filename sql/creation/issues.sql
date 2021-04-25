@@ -1,6 +1,10 @@
 -- Table: public.issues
 
--- DROP TABLE public.issues;
+CREATE SEQUENCE issues_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE;
 
 CREATE TABLE public.issues
 (

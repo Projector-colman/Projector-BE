@@ -1,7 +1,5 @@
 -- Table: public.linked_issues
 
--- DROP TABLE public.linked_issues;
-
 CREATE TABLE public.linked_issues
 (
     id integer NOT NULL,
