@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update a user:
-// Only the user itself.
+// Only the user itself and the admin.
 router.put('/:id', auth, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -54,8 +54,8 @@ router.put('/:id', auth, async (req, res) => {
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
-    // If this is not the user, don't update.
-    if (req.params.id != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    // If this is not the user or an admin, don't update.
+    if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     let { name, email, password } = _.pick(req.body, ['name', 'email', 'password']);
     
@@ -81,13 +81,13 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete a user
-// Only the owner - (Maybe admin too ? -> TODO)
+// Only the owner or admin
 router.delete('/:id', auth, async (req, res) => {
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
-    // If this is not the owner, don't delete.
-    if (req.params.id != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    // If this is not the owner or an admin, don't delete.
+    if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     await User.destroy({
         where: {
