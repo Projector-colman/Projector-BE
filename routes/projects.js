@@ -33,13 +33,13 @@ router.post('/', auth, async (req, res) => {
 })
 
 // Update a project
-// Only Owner of the project.
+// Only Owner of the project and admin
 router.put('/:id', auth, async (req, res) => {
     let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
-    // If this is not the owner, don't update.
-    if (project.owner != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    // If this is not the owner or admin, don't update.
+    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     let { name } = _.pick(req.body, ['name']);
 
@@ -53,13 +53,13 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete a project
-// Only the owner
+// Only the owner and admin
 router.delete('/:id', auth, async (req, res) => {
     let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
     // If this is not the owner, don't delete.
-    if (project.owner != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     await Project.destroy({
         where: {

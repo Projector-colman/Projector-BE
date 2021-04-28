@@ -40,13 +40,13 @@ router.post('/', auth, async (req, res) => {
 })
 
 // Update an issue
-// Only Owner of the issue.
+// Only Owner of the issue and admin.
 router.put('/:id', auth, async (req, res) => {
     let issue = await Issue.findByPk(req.params.id);
     if (!issue) return res.status(400).send('Issue does not exist.');
 
-    // If this is not the owner, don't update.
-    if (issue.reporter != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    // If this is not the owner or admin, don't update.
+    if ((issue.reporter != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     // Should we change reporter also ?
     let { name, description, epic, asignee, storyPoints, priority, sprint, status } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']);
@@ -70,13 +70,13 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete an issue
-// Only the owner
+// Only the owner and admin
 router.delete('/:id', auth, async (req, res) => {
     let issue = await Issue.findByPk(req.params.id);
     if (!issue) return res.status(400).send('Issue does not exist.');
 
     // If this is not the owner, don't delete.
-    if (issue.reporter != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    if ((issue.reporter != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     await Issue.destroy({
         where: {

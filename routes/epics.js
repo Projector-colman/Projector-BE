@@ -36,13 +36,13 @@ router.post('/', auth, async (req, res) => {
 })
 
 // Update an epic
-// Only Owner of the epic.
+// Only Owner of the epic and admin.
 router.put('/:id', auth, async (req, res) => {
     let epic = await Epic.findByPk(req.params.id);
     if (!epic) return res.status(400).send('Epic does not exist.');
 
-    // If this is not the owner, don't update.
-    if (epic.reporter != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    // If this is not the owner or admin, don't update.
+    if ((epic.reporter != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     // Should we change reporter also ?
     let { name, description, project, asignee } = _.pick(req.body, ['name', 'description', 'project', 'asignee']);
@@ -62,13 +62,13 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete an epic
-// Only the owner
+// Only the owner and admin
 router.delete('/:id', auth, async (req, res) => {
     let epic = await Epic.findByPk(req.params.id);
     if (!epic) return res.status(400).send('Epic does not exist.');
 
-    // If this is not the owner, don't delete.
-    if (epic.reporter != req.user.id) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    // If this is not the owner or admin, don't delete.
+    if ((epic.reporter != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     await Epic.destroy({
         where: {
