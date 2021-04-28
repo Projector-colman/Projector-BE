@@ -1,10 +1,14 @@
 -- Table: public.linked_issues
 
+-- DROP TABLE public.linked_issues;
+
 CREATE TABLE public.linked_issues
 (
     id integer NOT NULL,
     blocker integer NOT NULL,
     blocked integer NOT NULL,
+    "createdAt" date,
+    "updatedAt" date,
     CONSTRAINT linked_issues_pkey PRIMARY KEY (id),
     CONSTRAINT "blocked id" FOREIGN KEY (id)
         REFERENCES public.issues (id) MATCH SIMPLE
