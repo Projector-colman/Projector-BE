@@ -1,6 +1,10 @@
 -- Table: public.sprints
 
--- DROP TABLE public.sprints;
+CREATE SEQUENCE sprints_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE;
 
 CREATE TABLE public.sprints
 (

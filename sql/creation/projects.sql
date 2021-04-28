@@ -1,6 +1,10 @@
 -- Table: public.projects
 
--- DROP TABLE public.projects;
+CREATE SEQUENCE projects_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE;
 
 CREATE TABLE public.projects
 (
