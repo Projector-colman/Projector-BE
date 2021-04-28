@@ -3,6 +3,7 @@ const _ = require('lodash');
 const { Issue, validate, validateStatus } = require('../models/issue');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
+const { Project } = require('../models/project');
 const router = express.Router();
 
 // Get all issues
