@@ -15,14 +15,14 @@ router.post('/', async (req, res) => {
     // If the user does not exist return error 400.
     let user = await User.findOne({ where: { email: req.body.email }});
     if (!user) return res.status(400).send('Invalid email or password.');
-
+    
     // If the password is not valid return error 400.
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) return res.status(400).send('Invalid email or password.');
 
     // Generate a JWT Token and send it back to the user session.
     const token = user.generateAuthToken();
-    res.send(token);
+    res.send({token: token});
 });
 
 // Validate an auth user request.
