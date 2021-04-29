@@ -9,7 +9,9 @@ const router = express.Router();
 // Get all issues
 // Only admin can get it.
 router.get('/', [auth, admin], async (req, res) => {
-    const issues = await Issue.findAll({ order: [[ 'name', 'ASC' ]] });
+    const filter = _.pick(req.query, ['id', 'epic', 'asignee', 'priority', 'sprint', 'status', 'name']);
+    const issues = await Issue.findAll({ where: filter,
+                                         order: [[ 'name', 'ASC' ]] });
     res.send(issues);
 });
 

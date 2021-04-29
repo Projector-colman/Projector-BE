@@ -7,14 +7,17 @@ const router = express.Router();
 // Get all projects
 // Everyone can get it.
 router.get('/', async (req, res) => {
-    const projects = await (await Project.findAll({order: [[ 'name', 'ASC' ]] }));
+    const filter = _.pick(req.query, ['id', 'owner']);
+    const projects = await Project.findAll({ where : filter,
+                                             order: [[ 'name', 'ASC' ]] });
     res.send(projects);
 });
 
 // Get all projects that the user owns
 // Everyone can get it
 router.get('/owner', auth, async (req, res) => {
-    const projects = await (await Project.findAll({order: [[ 'name', 'ASC' ]] })).filter(proj => proj.owner == req.user.id);
+    const projects = await Project.findAll({ where: {owner: req.user.id}, 
+                                             order: [[ 'name', 'ASC' ]] });
     res.send(projects);
 });
 
