@@ -4,9 +4,9 @@ const db = require('../startup/db');
 const { Project } = require("./project");
 const { User } = require("./user");
 
-class ProjectUser extends Model {};
+class UserProjects extends Model {};
 
-ProjectUser.init({
+UserProjects.init({
   // Model attributes are defined here
   project: {
     type: DataTypes.INTEGER,
@@ -34,20 +34,24 @@ ProjectUser.init({
   }
 }, {
   sequelize: db,
-  modelName: 'ProjectUser',
+  modelName: 'UserProjects',
   tableName: 'users_project'
 });
 
+// Relations
+User.belongsToMany(Project, { through: UserProjects });
+Project.belongsToMany(User, { through: UserProjects });
+
 // User validation.
-function validateProjectUser(projectUser) {
+function validateUserProjects(userProjects) {
   const schema = Joi.object({
     project: Joi.number().min(1).required(),
     user: Joi.number().min(1).required(),
   });
 
-  return schema.validate(projectUser);
+  return schema.validate(userProjects);
 }
 
 // Exports
-module.exports.ProjectUser = ProjectUser;
-module.exports.validate = validateProjectUser;
+module.exports.UserProjects = UserProjects;
+module.exports.validate = validateUserProjects;
