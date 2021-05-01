@@ -43,6 +43,10 @@ function validateProject(project) {
   return schema.validate(project);
 }
 
+// Relations
+User.belongsToMany(Project, { through: 'UserProjects' });
+Project.belongsToMany(User, { through: 'UserProjects' });
+
 // Exports
 module.exports.Project = Project;
 module.exports.validate = validateProject;

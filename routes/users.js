@@ -5,6 +5,7 @@ const { User, validate } = require('../models/user');
 const { Issue } = require('../models/issue');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
+const { Project } = require('../models/project');
 const router = express.Router();
 
 // // Get my details.
@@ -122,6 +123,21 @@ router.get('/:id/issues/assignee', auth, async (req, res) => {
         order: [[ 'name', 'ASC' ]] 
     });
     res.send(issues);
+});
+
+// Get all project associated to this user
+router.get('/:id/projects', auth, async (req, res) => {
+    let user = await User.findByPk(req.params.id);
+    if (!user) return res.status(400).send('User does not exist.');
+
+    let projects = await User.findOne({ 
+        where: {
+            id: req.params.id
+        },
+        include: Project
+    });
+
+    console.log(projects);
 });
 
 module.exports = router;
