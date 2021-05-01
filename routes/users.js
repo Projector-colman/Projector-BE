@@ -137,7 +137,7 @@ router.get('/:id/projects', auth, async (req, res) => {
         include: Project
     });
 
-    console.log(projects);
+    console.log(projects.getDataValue('Projects'));
 });
 
 module.exports = router;
