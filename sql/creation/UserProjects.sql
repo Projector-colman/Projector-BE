@@ -1,21 +1,20 @@
--- Table: public.project_users
+-- Table: public.UserProjects
 
--- DROP TABLE public.project_users;
+-- DROP TABLE public."UserProjects";
 
-CREATE TABLE public.project_users
+CREATE TABLE public."UserProjects"
 (
-    id integer NOT NULL,
-    project integer NOT NULL,
-    "user" integer NOT NULL,
+    "ProjectId" integer NOT NULL,
+    "UserId" integer NOT NULL,
     "createdAt" date,
     "updatedAt" date,
-    CONSTRAINT project_users_pkey PRIMARY KEY (id),
-    CONSTRAINT "project id" FOREIGN KEY (project)
+    CONSTRAINT "UserProjects_pkey" PRIMARY KEY ("ProjectId", "UserId"),
+    CONSTRAINT "project id" FOREIGN KEY ("ProjectId")
         REFERENCES public.projects (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
-    CONSTRAINT "user id" FOREIGN KEY ("user")
+    CONSTRAINT "user id" FOREIGN KEY ("UserId")
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
@@ -26,5 +25,5 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.project_users
+ALTER TABLE public."UserProjects"
     OWNER to projector;

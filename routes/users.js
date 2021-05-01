@@ -110,7 +110,7 @@ router.get('/:id/issues/reporter', auth, async (req, res) => {
         where: { reporter: user.id },
         order: [[ 'name', 'ASC' ]] 
     });
-    res.send(issues);
+    res.status(200).send(issues);
 });
 
 // Get all assigned issues of a user
@@ -122,7 +122,7 @@ router.get('/:id/issues/assignee', auth, async (req, res) => {
         where: { asignee: user.id },
         order: [[ 'name', 'ASC' ]] 
     });
-    res.send(issues);
+    res.status(200).send(issues);
 });
 
 // Get all project associated to this user
@@ -130,14 +130,9 @@ router.get('/:id/projects', auth, async (req, res) => {
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
-    let projects = await User.findOne({ 
-        where: {
-            id: req.params.id
-        },
-        include: Project
-    });
+    projects = await user.getProjects();
 
-    console.log(projects.getDataValue('Projects'));
+    res.status(200).send(projects);
 });
 
 module.exports = router;
