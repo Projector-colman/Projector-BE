@@ -3,6 +3,7 @@ const { DataTypes, Model } = require('sequelize');
 const db = require('../startup/db');
 const { Epic } = require('./epic');
 const { User } = require("./user");
+const { Sprint } = require("./sprint");
 
 class Issue extends Model {};
 
@@ -95,6 +96,13 @@ Issue.init({
   modelName: 'Issue',
   tableName: 'issues'
 });
+
+// Relations
+Epic.hasMany(Issue, { foreignKey: 'epic' });
+Issue.belongsTo(Epic);
+Issue.hasOne(User, { foreignKey: 'asignee' });
+Issue.hasOne(User, { foreignKey: 'reporter' });
+Issue.hasOne(Sprint, { foreignKey: 'sprint' });
 
 // Object validation.
 function validateIssue(issue) {

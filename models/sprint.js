@@ -1,8 +1,7 @@
-const jwt = require("jsonwebtoken");
-const config = require("config");
 const Joi = require('joi');
 const { DataTypes, Model } = require('sequelize');
 const db = require('../startup/db');
+const { Project } = require('./project');
 
 class Sprint extends Model {};
 
@@ -32,6 +31,9 @@ Sprint.init({
   modelName: 'Sprint',
   tableName: 'sprints'
 });
+
+Project.hasMany(Sprint, { foreignKey: 'project' });
+Sprint.belongsTo(Project);
 
 // Sprint validation.
 function validateSprint(sprint) {

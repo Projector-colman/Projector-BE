@@ -33,6 +33,13 @@ Comment.init({
   tableName: 'issue_comments'
 });
 
+// Relations
+Issue.hasMany(Comment, {
+  foreignKey: 'issue'
+});
+Comment.belongsTo(Issue);
+Comment.hasOne(User, { foreignKey: 'writer' });
+
 // Object validation.
 function validateComment(comment) {
   const schema = Joi.object({

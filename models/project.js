@@ -46,6 +46,9 @@ function validateProject(project) {
 // Relations
 User.belongsToMany(Project, { through: 'UserProjects' });
 Project.belongsToMany(User, { through: 'UserProjects' });
+User.hasMany(Project, {
+  foreignKey: 'owner'
+});
 
 // Exports
 module.exports.Project = Project;

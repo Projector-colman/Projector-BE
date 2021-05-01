@@ -66,6 +66,12 @@ Epic.init({
   tableName: 'epics'
 });
 
+// Relations
+Project.hasMany(Epic, { foreignKey: 'project' });
+Epic.belongsTo(Project);
+Epic.hasOne(User, { foreignKey: 'asignee' });
+Epic.hasOne(User, { foreignKey: 'reporter' });
+
 // Object validation.
 function validateEpic(epic) {
   const schema = Joi.object({

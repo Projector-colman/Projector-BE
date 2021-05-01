@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const router = express.Router();
 
-
 // Authenticate a user.
 router.post('/', async (req, res) => {
     // If the user in the body request is not valid return error 400.
