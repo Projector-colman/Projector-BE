@@ -79,4 +79,14 @@ router.delete('/:id', auth, async (req, res) => {
     res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
 });
 
+// Get all project associated to this user
+router.get('/:id/users', auth, async (req, res) => {
+    let project = await Project.findByPk(req.params.id);
+    if (!project) return res.status(400).send('Project does not exist.');
+
+    user = await project.getUsers();
+
+    res.status(200).send(user);
+});
+
 module.exports = router;
