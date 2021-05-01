@@ -106,6 +106,9 @@ router.get('/:id/issues/reporter', auth, async (req, res) => {
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
+    // If this is not the owner or an admin, don't delete.
+    if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
     const issues = await Issue.findAll({ 
         where: { reporter: user.id },
         order: [[ 'name', 'ASC' ]] 
@@ -117,6 +120,9 @@ router.get('/:id/issues/reporter', auth, async (req, res) => {
 router.get('/:id/issues/assignee', auth, async (req, res) => {
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
+
+    // If this is not the owner or an admin, don't delete.
+    if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     const issues = await Issue.findAll({ 
         where: { asignee: user.id },
@@ -130,9 +136,12 @@ router.get('/:id/projects', auth, async (req, res) => {
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
+    // If this is not the owner or an admin, don't delete.
+    if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
     projects = await user.getProjects();
 
-    res.status(200).send(projects);
+    res.status(200).send(_.map(projects, _.partialRight(_.pick, ['id', 'name'])));
 });
 
 module.exports = router;

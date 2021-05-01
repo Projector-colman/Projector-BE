@@ -2,6 +2,7 @@ const express = require('express');
 const _ = require('lodash');
 const { Project, validate } = require('../models/project');
 const auth = require('../middleware/auth');
+const { User } = require('../models/user');
 const router = express.Router();
 
 // Get all projects
@@ -79,14 +80,54 @@ router.delete('/:id', auth, async (req, res) => {
     res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
 });
 
-// Get all project associated to this user
+// Get all users associated to this project
 router.get('/:id/users', auth, async (req, res) => {
     let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
-    user = await project.getUsers();
+    // If this is not the owner, don't delete.
+    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
-    res.status(200).send(user);
+    users = await project.getUsers();
+
+    res.status(200).send(_.map(users, _.partialRight(_.pick, ['id', 'name', 'email'])));
+});
+
+// add a user access to project
+router.post('/:id/users/:userId', auth, async (req, res) => {
+    let project = await Project.findByPk(req.params.id);
+    if (!project) return res.status(400).send('Project does not exist.');
+
+    // If this is not the owner, don't add.
+    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    user = await User.findByPk(req.params.userId);
+    if (!user) return res.status(400).send('User does not exists');
+
+    await project.addUser(user);
+
+    res.status(200).send(_.map(users, _.partialRight(_.pick, ['id', 'name', 'email'])));
+});
+
+// remove a user access to project
+router.delete('/:id/users/:userId', auth, async (req, res) => {
+    let project = await Project.findByPk(req.params.id);
+    if (!project) return res.status(400).send('Project does not exist.');
+
+    // If this is not the owner, don't delete.
+    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    user = await project.getUsers({
+        where: {
+            id: req.params.userId
+        }        
+    });
+
+    if (!user) return res.status(400).send('User is not a member of this project');
+
+    await project.removeUser(user);
+
+    res.status(200).send(_.map(users, _.partialRight(_.pick, ['id', 'name', 'email'])));
 });
 
 module.exports = router;
