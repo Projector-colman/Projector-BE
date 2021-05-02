@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
 
     // Generate a JWT Token and send it back to the user session.
     const token = user.generateAuthToken();
-    res.send({token: token});
+    res.send({token: token, id: user.id});
 });
 
 // Validate an auth user request.
