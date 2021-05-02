@@ -69,8 +69,8 @@ Epic.init({
 // Relations
 Project.hasMany(Epic, { foreignKey: 'project' });
 Epic.belongsTo(Project);
-Epic.hasOne(User, { foreignKey: 'asignee' });
-Epic.hasOne(User, { foreignKey: 'reporter' });
+Epic.hasOne(User, { sourceKey: 'asignee', foreignKey: 'id' });
+Epic.hasOne(User, { sourceKey: 'reporter', foreignKey: 'id' });
 
 // Object validation.
 function validateEpic(epic) {

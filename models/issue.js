@@ -100,9 +100,9 @@ Issue.init({
 // Relations
 Epic.hasMany(Issue, { foreignKey: 'epic' });
 Issue.belongsTo(Epic);
-Issue.hasOne(User, { foreignKey: 'asignee' });
-Issue.hasOne(User, { foreignKey: 'reporter' });
-Issue.hasOne(Sprint, { foreignKey: 'sprint' });
+Issue.hasOne(User, { sourceKey: 'asignee', foreignKey: 'id' });
+Issue.hasOne(User, { sourceKey: 'reporter', foreignKey: 'id' });
+Issue.hasOne(Sprint, { sourceKey: 'sprint', foreignKey: 'id' });
 
 // Object validation.
 function validateIssue(issue) {
