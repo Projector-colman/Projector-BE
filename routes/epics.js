@@ -14,6 +14,7 @@ router.get('/', async (req, res) => {
 // Post a new epic
 // Every authenticated user can post an epic
 router.post('/', auth, async (req, res) => {
+    console.log('post epic')
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 

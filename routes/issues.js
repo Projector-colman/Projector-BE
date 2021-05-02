@@ -20,7 +20,7 @@ router.get('/', [auth, admin], async (req, res) => {
 router.post('/', auth, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
-
+    
     let { name, description, epic, asignee, storyPoints, priority, sprint, status } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']);
 
     // Same name for two issues in the same epic is not allowed
@@ -28,6 +28,7 @@ router.post('/', auth, async (req, res) => {
     if (issue) return res.status(400).send('An issue in this epic with this name already exists');
 
     const reporter = req.user.id;
+    
     issue = await Issue.create({
         name,
         epic,
