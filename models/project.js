@@ -27,6 +27,14 @@ Project.init({
         model: User,
         key: 'id'
     }
+  },
+  key: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+      len: [2,5],
+    }
   }
 }, {
   sequelize: db,

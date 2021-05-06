@@ -8,7 +8,7 @@ const router = express.Router();
 // Get all projects
 // Everyone can get it.
 router.get('/', async (req, res) => {
-    const filter = _.pick(req.query, ['id', 'owner']);
+    const filter = _.pick(req.query, ['id', 'owner', 'name', 'key']);
     const projects = await Project.findAll({ where : filter,
                                              order: [[ 'name', 'ASC' ]] });
     res.send(projects);

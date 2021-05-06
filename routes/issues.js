@@ -21,7 +21,7 @@ router.post('/', auth, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     
-    let { name, description, epic, asignee, storyPoints, priority, sprint, status } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']);
+    let { name, description, epic, asignee, storyPoints, priority, sprint, status, blocked } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint', 'status', 'blocked']);
 
     // Same name for two issues in the same epic is not allowed
     let issue = await Issue.findOne({ where: { name: name, epic: epic }});
@@ -41,6 +41,10 @@ router.post('/', auth, async (req, res) => {
         status
     });
 
+    if(blocked) {
+        //TODO 
+        // linkedIssue.create({issue.id, blocked});
+    }
     res.status(200).send(_.pick(issue, ['id', 'name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']));
 })
 
