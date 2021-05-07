@@ -11,7 +11,7 @@ CREATE TABLE public.projects
     id integer NOT NULL DEFAULT nextval('projects_id_seq'::regclass),
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     owner integer NOT NULL,
-    key string NOT NULL,
+    key character varying(255) NOT NULL,
     "createdAt" date,
     "updatedAt" date,
     CONSTRAINT projects_pkey PRIMARY KEY (id),
