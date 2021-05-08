@@ -85,6 +85,10 @@ Issue.init({
         isInt: true, // checks for valid integers
         min: 1, // only allow values >= 1
     },
+    references: {
+      model: Sprint,
+      key: 'id'
+  }
   },
   status: {
     type: DataTypes.ENUM('to-do', 'in-progress', 'verify', 'done'),
@@ -98,11 +102,25 @@ Issue.init({
 });
 
 // Relations
+// user reports many issues
+User.hasMany(Issue, { foreignKey: 'reporter' });
+Issue.belongsTo(User);
+
+// user assigned to many issues
+User.hasMany(Issue, { foreignKey: 'assignee' });
+Issue.belongsTo(User);
+
+// epics have many issues
 Epic.hasMany(Issue, { foreignKey: 'epic' });
-//Issue.belongsTo(Epic);
-Issue.hasOne(User, { sourceKey: 'asignee', foreignKey: 'id' });
-Issue.hasOne(User, { sourceKey: 'reporter', foreignKey: 'id' });
-Issue.hasOne(Sprint, { sourceKey: 'sprint', foreignKey: 'id' });
+Issue.belongsTo(Epic);
+
+// issues blocks and blocked by many issues
+Issue.belongsToMany(Issue, { as: 'blocker', through: 'linked_issues' });
+Issue.belongsToMany(Issue, { as: 'blocked', through: 'linked_issues' });
+
+// Sprints have many issues
+Sprint.hasMany(Issue, { foreignKey: 'sprint' });
+Issue.belongsTo(Sprint);
 
 // Object validation.
 function validateIssue(issue) {

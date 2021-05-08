@@ -67,10 +67,17 @@ Epic.init({
 });
 
 // Relations
+// user reports many epics
+User.hasMany(Epic, { foreignKey: 'reporter' });
+Epic.belongsTo(User);
+
+// user assigned to many epics
+User.hasMany(Epic, { foreignKey: 'assignee' });
+Epic.belongsTo(User);
+
+// project have many epics
 Project.hasMany(Epic, { foreignKey: 'project' });
-//Epic.belongsTo(Project);
-Epic.hasOne(User, { sourceKey: 'asignee', foreignKey: 'id' });
-Epic.hasOne(User, { sourceKey: 'reporter', foreignKey: 'id' });
+Epic.belongsTo(Project);
 
 // Object validation.
 function validateEpic(epic) {
