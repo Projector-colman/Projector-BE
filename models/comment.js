@@ -4,7 +4,7 @@ const db = require('../startup/db');
 const { Issue } = require('./issue');
 const { User } = require('./user');
 
-class Comment extends Model {};
+class Comment extends Model { };
 
 Comment.init({
   // Model attributes are defined here
@@ -24,9 +24,13 @@ Comment.init({
       min: 1, // only allow values >= 1
     },
     references: {
-        model: User,
-        key: 'id'
+      model: User,
+      key: 'id'
     }
+  },
+  time: {
+    type: DataTypes.DATE,
+    allowNull: true, // won't allow null
   },
   issue: {
     type: DataTypes.INTEGER,
@@ -36,8 +40,8 @@ Comment.init({
       min: 1, // only allow values >= 1
     },
     references: {
-        model: Issue,
-        key: 'id'
+      model: Issue,
+      key: 'id'
     }
   }
 }, {
