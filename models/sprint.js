@@ -32,6 +32,8 @@ Sprint.init({
   tableName: 'sprints'
 });
 
+// Relations
+// project have many sprints
 Project.hasMany(Sprint, { foreignKey: 'project' });
 Sprint.belongsTo(Project);
 

@@ -2,6 +2,7 @@ const Joi = require('joi');
 const { DataTypes, Model } = require('sequelize');
 const db = require('../startup/db');
 const { Issue } = require('./issue');
+const { User } = require('./user');
 
 class Comment extends Model {};
 
@@ -13,6 +14,18 @@ Comment.init({
     validate: {
       notEmpty: true, // don't allow empty strings
       len: [1, 255], // only allow values with length between 0 and 255
+    }
+  },
+  writer: {
+    type: DataTypes.INTEGER,
+    allowNull: false, // won't allow null
+    validate: {
+      isInt: true, // checks for valid integers
+      min: 1, // only allow values >= 1
+    },
+    references: {
+        model: User,
+        key: 'id'
     }
   },
   issue: {
@@ -34,11 +47,13 @@ Comment.init({
 });
 
 // Relations
-Issue.hasMany(Comment, {
-  foreignKey: 'issue'
-});
+// user have many comments
+User.hasMany(Comment, { foreignKey: 'writer' });
+Comment.belongsTo(User);
+
+// issues have many comments
+Issue.hasMany(Comment, { foreignKey: 'issue' });
 Comment.belongsTo(Issue);
-Comment.hasOne(User, { foreignKey: 'writer' });
 
 // Object validation.
 function validateComment(comment) {
