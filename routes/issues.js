@@ -3,7 +3,6 @@ const _ = require('lodash');
 const { Issue, validate, validateStatus } = require('../models/issue');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
-const { Project } = require('../models/project');
 const router = express.Router();
 
 // Get all issues
@@ -21,7 +20,7 @@ router.post('/', auth, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     
-    let { name, description, epic, asignee, storyPoints, priority, sprint, status, blocked } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint', 'status', 'blocked']);
+    let { name, description, epic, asignee, storyPoints, priority, sprint, status, blockerId } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint', 'status', 'blockerId']);
 
     // Same name for two issues in the same epic is not allowed
     let issue = await Issue.findOne({ where: { name: name, epic: epic }});
@@ -41,10 +40,13 @@ router.post('/', auth, async (req, res) => {
         status
     });
 
-    if(blocked) {
-        //TODO 
-        // linkedIssue.create({issue.id, blocked});
-    }
+    // if (blockerId) { 
+    //     blockerIssue = await Issue.findByPk(blockerId);
+    //     if (!blockerIssue) return res.status(400).send('Blocking issue does not exist.');
+
+    //     issue.createBlocker({ blocker: blockerId, blocked: issue.id });
+    // }
+
     res.status(200).send(_.pick(issue, ['id', 'name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']));
 })
 

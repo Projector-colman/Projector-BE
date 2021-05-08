@@ -26,6 +26,11 @@ Sprint.init({
       isDate: true,
     }
   },
+  status: {
+    type: DataTypes.ENUM('active', 'planned'),
+    allowNull: true, // will allow null
+    defaultValue: null
+  }
 }, {
   sequelize: db,
   modelName: 'Sprint',
@@ -42,6 +47,7 @@ function validateSprint(sprint) {
   const schema = Joi.object({
     project: Joi.number().required(),
     date: Joi.date().required(),
+    status: Joi.string().valid('active', 'planned'),
   });
 
   return schema.validate(sprint);

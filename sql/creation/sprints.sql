@@ -1,10 +1,12 @@
--- Table: public.sprints
-
 CREATE SEQUENCE sprints_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE;
+
+-- Table: public.sprints
+
+-- DROP TABLE public.sprints;
 
 CREATE TABLE public.sprints
 (
@@ -13,6 +15,7 @@ CREATE TABLE public.sprints
     "startTime" date NOT NULL,
     "createdAt" date,
     "updatedAt" date,
+    status character varying COLLATE pg_catalog."default",
     CONSTRAINT sprints_pkey PRIMARY KEY (id),
     CONSTRAINT "project id" FOREIGN KEY (id)
         REFERENCES public.projects (id) MATCH SIMPLE

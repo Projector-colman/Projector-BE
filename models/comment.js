@@ -58,14 +58,9 @@ Comment.belongsTo(Issue, { foreignKey: { name: 'issue' } });
 // Object validation.
 function validateComment(comment) {
   const schema = Joi.object({
-    name: Joi.string().min(2).max(255).required(),
     description: Joi.string().max(255),
-    epic: Joi.number().required(),
-    asignee: Joi.number(),
-    storyPoints: Joi.number(),
-    priority: Joi.number(),
-    sprint: Joi.number(),
-    status: Joi.string().valid('to-do', 'in-progress', 'verify', 'done')
+    issue: Joi.number().required(),
+    writer: Joi.number().required(),
   });
 
   return schema.validate(comment);
