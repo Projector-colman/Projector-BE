@@ -26,17 +26,19 @@ router.get('/owner', auth, async (req, res) => {
 // Every authenticated user can post a project
 router.post('/', auth, async (req, res) => {
     const { error } = validate(req.body);
+
     if (error) return res.status(400).send(error.details[0].message);
 
-    let { name } = _.pick(req.body, ['name']);
-
+    let { name, key } = _.pick(req.body, ['name', 'key']);
+    
     let project = await Project.findOne({ where: { name: name }});
     if (project) return res.status(400).send('Project with this name is already exists');
-
+    
     const owner = req.user.id;
     project = await Project.create({
         name,
-        owner
+        owner,
+        key
     });
 
     res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
