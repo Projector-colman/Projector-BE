@@ -99,19 +99,23 @@ router.get('/:id/users', auth, async (req, res) => {
 });
 
 // add a user access to project
-router.post('/:id/users/:userId', auth, async (req, res) => {
+router.post('/:id/users', auth, async (req, res) => {
     let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
     // If this is not the owner, don't add.
     if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
-    user = await User.findByPk(req.params.userId);
+    const { userId } = _.pick(req.body, ['userId']);
+
+    user = await User.findByPk(userId);
     if (!user) return res.status(400).send('User does not exists');
 
     await project.addUser(user);
 
-    res.status(200).send(_.map(users, _.partialRight(_.pick, ['id', 'name', 'email'])));
+    console.log(user.dataValues);
+
+    res.status(200).send(_.pick(user.dataValues, ['id', 'name', 'email']));
 });
 
 // remove a user access to project
