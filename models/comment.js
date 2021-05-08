@@ -48,12 +48,12 @@ Comment.init({
 
 // Relations
 // user have many comments
-User.hasMany(Comment, { foreignKey: 'writer' });
-Comment.belongsTo(User);
+User.hasMany(Comment, { foreignKey: { name: 'writer' } });
+Comment.belongsTo(User, { foreignKey: { name: 'writer' } });
 
 // issues have many comments
-Issue.hasMany(Comment, { foreignKey: 'issue' });
-Comment.belongsTo(Issue);
+Issue.hasMany(Comment, { foreignKey: { name: 'issue' } });
+Comment.belongsTo(Issue, { foreignKey: { name: 'issue' } });
 
 // Object validation.
 function validateComment(comment) {

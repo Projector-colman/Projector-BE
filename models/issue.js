@@ -103,24 +103,24 @@ Issue.init({
 
 // Relations
 // user reports many issues
-User.hasMany(Issue, { foreignKey: 'reporter' });
-Issue.belongsTo(User);
+User.hasMany(Issue, { foreignKey: { name: 'reporter' } });
+Issue.belongsTo(User, { foreignKey: { name: 'reporter' } });
 
 // user assigned to many issues
-User.hasMany(Issue, { foreignKey: 'assignee' });
-Issue.belongsTo(User);
+User.hasMany(Issue, { foreignKey: { name: 'asignee' } });
+Issue.belongsTo(User, { foreignKey: { name: 'asignee' } });
 
 // epics have many issues
-Epic.hasMany(Issue, { foreignKey: 'epic' });
-Issue.belongsTo(Epic);
+Epic.hasMany(Issue, { foreignKey: { name: 'epic' } });
+Issue.belongsTo(Epic, { foreignKey: { name: 'epic' } });
 
 // issues blocks and blocked by many issues
 Issue.belongsToMany(Issue, { as: 'blocker', through: 'linked_issues' });
 Issue.belongsToMany(Issue, { as: 'blocked', through: 'linked_issues' });
 
 // Sprints have many issues
-Sprint.hasMany(Issue, { foreignKey: 'sprint' });
-Issue.belongsTo(Sprint);
+Sprint.hasMany(Issue, { foreignKey: { name: 'sprint' } });
+Issue.belongsTo(Sprint, { foreignKey: { name: 'sprint' } });
 
 // Object validation.
 function validateIssue(issue) {

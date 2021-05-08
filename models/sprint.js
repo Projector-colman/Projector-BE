@@ -34,8 +34,8 @@ Sprint.init({
 
 // Relations
 // project have many sprints
-Project.hasMany(Sprint, { foreignKey: 'project' });
-Sprint.belongsTo(Project);
+Project.hasMany(Sprint, { foreignKey: { name: 'project' } });
+Sprint.belongsTo(Project, { foreignKey: { name: 'project' } });
 
 // Sprint validation.
 function validateSprint(sprint) {
