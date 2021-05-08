@@ -88,7 +88,7 @@ Issue.init({
     references: {
       model: Sprint,
       key: 'id'
-  }
+    }
   },
   status: {
     type: DataTypes.ENUM('to-do', 'in-progress', 'verify', 'done'),
@@ -133,6 +133,7 @@ function validateIssue(issue) {
     priority: Joi.number(),
     sprint: Joi.number(),
     status: Joi.string().valid('to-do', 'in-progress', 'verify', 'done'),
+    blockerId: Joi.number()
   });
 
   return schema.validate(issue);
