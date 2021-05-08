@@ -41,6 +41,10 @@ User.init({
       len: [5, 255], // only allow values with length between 5 and 255
     }
   },
+  image: {
+    type: DataTypes.STRING,
+    allowNull: false, // won't allow null
+  },
   isAdmin: {
     type: DataTypes.BOOLEAN,
     allowNull: false,

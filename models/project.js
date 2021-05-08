@@ -4,7 +4,7 @@ const { DataTypes, Model } = require('sequelize');
 const db = require('../startup/db');
 const { User } = require("./user");
 
-class Project extends Model {};
+class Project extends Model { };
 
 Project.init({
   // Model attributes are defined here
@@ -24,8 +24,8 @@ Project.init({
       min: 1, // only allow values >= 1
     },
     references: {
-        model: User,
-        key: 'id'
+      model: User,
+      key: 'id'
     }
   },
   key: {
@@ -33,8 +33,16 @@ Project.init({
     allowNull: false,
     validate: {
       notEmpty: true,
-      len: [2,5],
+      len: [2, 5],
     }
+  },
+  icon: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  color: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   sequelize: db,
