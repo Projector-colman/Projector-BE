@@ -28,10 +28,6 @@ Comment.init({
       key: 'id'
     }
   },
-  time: {
-    type: DataTypes.DATE,
-    allowNull: true, // won't allow null
-  },
   issue: {
     type: DataTypes.INTEGER,
     allowNull: false, // won't allow null
@@ -69,7 +65,7 @@ function validateComment(comment) {
     storyPoints: Joi.number(),
     priority: Joi.number(),
     sprint: Joi.number(),
-    status: Joi.string().valid('to-do', 'in-progress', 'verify', 'done'),
+    status: Joi.string().valid('to-do', 'in-progress', 'verify', 'done')
   });
 
   return schema.validate(comment);

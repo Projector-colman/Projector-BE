@@ -54,7 +54,9 @@ Project.init({
 function validateProject(project) {
   const schema = Joi.object({
     name: Joi.string().min(2).max(255).required(),
-    key: Joi.string().min(2).max(5).required()
+    key: Joi.string().min(2).max(5).required(),
+    icon: Joi.string(),
+    color: Joi.string()
   });
 
   return schema.validate(project);
