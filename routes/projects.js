@@ -114,6 +114,22 @@ router.post('/:id/users/:userId', auth, async (req, res) => {
     res.status(200).send(_.map(users, _.partialRight(_.pick, ['id', 'name', 'email'])));
 });
 
+// Get all issues associated to this project
+router.get('/:id/issues', auth, async (req, res) => {
+    let issues = [];
+    let project = await Project.findByPk(req.params.id);
+    if (!project) return res.status(400).send('Project does not exist.');
+
+    epics = await project.getEpics();
+
+    for(i=0; i < epics.length; i++) {
+        epicIssues = await epics[i].getIssues();
+        issues.push(...epicIssues)
+    }
+
+    res.status(200).send(issues);
+});
+
 // remove a user access to project
 router.delete('/:id/users/:userId', auth, async (req, res) => {
     let project = await Project.findByPk(req.params.id);

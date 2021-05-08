@@ -72,8 +72,8 @@ User.hasMany(Epic, { foreignKey: { name: 'reporter' } });
 Epic.belongsTo(User, { foreignKey: { name: 'reporter' } });
 
 // user assigned to many epics
-User.hasMany(Epic, { foreignKey: { name: 'assignee' } });
-Epic.belongsTo(User, { foreignKey: { name: 'assignee' } });
+User.hasMany(Epic, { foreignKey: { name: 'asignee' } });
+Epic.belongsTo(User, { foreignKey: { name: 'asignee' } });
 
 // project have many epics
 Project.hasMany(Epic, { foreignKey: { name: 'project' } });
