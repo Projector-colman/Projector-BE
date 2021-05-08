@@ -4,6 +4,10 @@ CREATE SEQUENCE users_id_seq
     NO MINVALUE
     NO MAXVALUE;
 
+-- Table: public.users
+
+-- DROP TABLE public.users;
+
 CREATE TABLE public.users
 (
     id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
@@ -13,6 +17,7 @@ CREATE TABLE public.users
     "isAdmin" boolean NOT NULL,
     "createdAt" date,
     "updatedAt" date,
+    image character varying(512) COLLATE pg_catalog."default",
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT email_uqky UNIQUE (email)
 )
