@@ -54,8 +54,8 @@ function validateProject(project) {
 
 // Relations
 // user owns many projects:
-User.hasMany(Project, { foreignKey: 'owner' });
-Project.belongsTo(User);
+//User.hasMany(Project, { foreignKey: 'owner' });
+//Project.belongsTo(User);
 
 // user contributor to and part of many projects
 User.belongsToMany(Project, { through: 'UserProjects' });

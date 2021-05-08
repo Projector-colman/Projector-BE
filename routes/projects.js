@@ -41,6 +41,9 @@ router.post('/', auth, async (req, res) => {
         key
     });
 
+    const user = await User.findOne({where: {id: req.user.id}});
+    await user.addProject(project)
+    
     res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
 })
 
