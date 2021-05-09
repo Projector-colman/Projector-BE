@@ -147,7 +147,7 @@ router.get('/:id/issues', auth, async (req, res) => {
 
     epics = await project.getEpics();
 
-    for(i=0; i < epics.length; i++) {
+    for(i = 0; i < epics.length; i++) {
         epicIssues = await epics[i].getIssues();
         issues.push(...epicIssues)
     }

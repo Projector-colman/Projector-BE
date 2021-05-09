@@ -133,7 +133,7 @@ function validateIssue(issue) {
     priority: Joi.number(),
     sprint: Joi.number(),
     status: Joi.string().valid('to-do', 'in-progress', 'verify', 'done'),
-    blockerId: Joi.number()
+    blockerId: Joi.any()
   });
 
   return schema.validate(issue);
