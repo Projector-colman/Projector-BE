@@ -7,7 +7,9 @@ const router = express.Router();
 // Get all epics
 // Everyone can get it.
 router.get('/', async (req, res) => {
-    const epics = await Epic.findAll({ order: [[ 'name', 'ASC' ]] });
+    const filter = _.pick(req.query, ['id', 'project']);
+    const epics = await Epic.findAll({ where: filter, 
+                                       order: [[ 'name', 'ASC' ]] });
     res.send(epics);
 });
 
