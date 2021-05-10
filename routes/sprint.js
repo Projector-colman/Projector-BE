@@ -9,7 +9,7 @@ const router = express.Router();
 // Get all comments
 // Only admin can get it.
 router.get('/', [auth, admin], async (req, res) => {
-    const filter = _.pick(req.query, ['id', 'project', 'startTime', 'createdAt', 'updatedAt']);
+    const filter = _.pick(req.query, ['id', 'project', 'startTime', 'status','createdAt', 'updatedAt']);
     const sprints = await Sprint.findAll({ 
         where: filter,
         order: [[ 'createdAt', 'ASC' ]] 
@@ -25,14 +25,15 @@ router.post('/', auth, async (req, res) => {
 
     if (error) return res.status(400).send(error.details[0].message);
 
-    let { project, startTime } = _.pick(req.body, ['project', 'startTime']);
+    let { project, startTime, status } = _.pick(req.body, ['project', 'startTime', 'status']);
     
     sprint = await Sprint.create({
         project,
-        startTime
+        startTime,
+        status
     });
     
-    res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime']));
+    res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime', 'status']));
 });
 
 // Delete a sprint
@@ -51,5 +52,5 @@ router.delete('/:id', auth, async (req, res) => {
         }
     });
 
-    res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime']));
+    res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime', 'status']));
 });

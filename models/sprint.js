@@ -27,7 +27,7 @@ Sprint.init({
     }
   },
   status: {
-    type: DataTypes.ENUM('active', 'planned'),
+    type: DataTypes.ENUM('active', 'planned', 'backlog'),
     allowNull: true, // will allow null
     defaultValue: null
   }
@@ -47,7 +47,7 @@ function validateSprint(sprint) {
   const schema = Joi.object({
     project: Joi.number().required(),
     date: Joi.date().required(),
-    status: Joi.string().valid('active', 'planned'),
+    status: Joi.string().valid('active', 'planned', 'backlog'),
   });
 
   return schema.validate(sprint);
