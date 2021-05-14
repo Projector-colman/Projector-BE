@@ -17,6 +17,7 @@ router.get('/', async (req, res) => {
 // Get all projects that the user owns
 // Everyone can get it
 router.get('/owner', auth, async (req, res) => {
+    console.log(req.user.id)
     const projects = await Project.findAll({ where: {owner: req.user.id}, 
                                              order: [[ 'name', 'ASC' ]] });
     res.send(projects);
@@ -42,7 +43,8 @@ router.post('/', auth, async (req, res) => {
     });
 
     const user = await User.findOne({where: {id: req.user.id}});
-    await user.addProject(project)
+    
+    await project.addUser(user);
     
     res.status(200).send(_.pick(project, ['id', 'name', 'owner']));
 })
