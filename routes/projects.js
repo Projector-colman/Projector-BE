@@ -154,6 +154,11 @@ router.get('/:id/issues', auth, async (req, res) => {
         issues.push(...epicIssues)
     }
 
+    for(i = 0; i < issues.length; i++) {
+        let user = await issues[i].getUser();
+        issues[i].asignee = user.name;
+    }
+
     res.status(200).send(issues);
 });
 
