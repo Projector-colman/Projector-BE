@@ -144,6 +144,8 @@ router.delete('/:id/users/:userId', auth, async (req, res) => {
 // Get all issues associated to this project
 router.get('/:id/issues', auth, async (req, res) => {
     let issues = [];
+    let users = [];
+    
     let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
@@ -154,10 +156,11 @@ router.get('/:id/issues', auth, async (req, res) => {
         issues.push(...epicIssues)
     }
 
-    for(i = 0; i < issues.length; i++) {
-        let user = await issues[i].getUser();
-        issues[i].asignee = user.name;
-    }
+    issues.forEach(issue => users.push(issue.getUser()));
+
+    let data = await Promise.all(users);
+    
+    data.forEach((user, i) => issues[i].asignee = user.name);
 
     res.status(200).send(issues);
 });
