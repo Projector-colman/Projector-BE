@@ -53,7 +53,7 @@ Comment.belongsTo(User, { foreignKey: { name: 'writer' } });
 
 // issues have many comments
 Issue.hasMany(Comment, { 
-  onDelete: 'CASCADE', 
+  onDelete: 'RESTRICT', 
   foreignKey: { name: 'issue' } 
 });
 Comment.belongsTo(Issue, { foreignKey: { name: 'issue' }});

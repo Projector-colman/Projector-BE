@@ -20,7 +20,7 @@ CREATE TABLE public.comments
     CONSTRAINT "issue id" FOREIGN KEY (issue)
         REFERENCES public.issues (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
+        ON DELETE CASCADE,
     CONSTRAINT "writer id" FOREIGN KEY (writer)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
