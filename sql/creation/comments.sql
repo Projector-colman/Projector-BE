@@ -1,10 +1,16 @@
+CREATE SEQUENCE comment_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE;
+
 -- Table: public.comments
 
 -- DROP TABLE public.comments;
 
 CREATE TABLE public.comments
 (
-    id integer NOT NULL,
+    id integer NOT NULL DEFAULT nextval('comment_id_seq'::regclass),
     description character varying(255) COLLATE pg_catalog."default" NOT NULL,
     issue integer NOT NULL,
     "createdAt" date,

@@ -43,7 +43,7 @@ User.init({
   },
   image: {
     type: DataTypes.STRING,
-    allowNull: false, // won't allow null
+    allowNull: true, // won't allow null
   },
   isAdmin: {
     type: DataTypes.BOOLEAN,

@@ -5,7 +5,6 @@ const { User, validate } = require('../models/user');
 const { Issue } = require('../models/issue');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
-const { Project } = require('../models/project');
 const router = express.Router();
 
 // // Get my details.
@@ -30,7 +29,7 @@ router.post('/', async (req, res) => {
     let user = await User.findOne({ where: { email: req.body.email }});
     if (user) return res.status(400).send('User already registered.');
 
-    let { name, email, password } = _.pick(req.body, ['name', 'email', 'password']);
+    let { name, email, password, image } = _.pick(req.body, ['name', 'email', 'password', 'image']);
     
     // Hash the password
     const salt = await bcrypt.genSalt(10);
@@ -38,11 +37,12 @@ router.post('/', async (req, res) => {
     user = await User.create({
         name,
         email,
-        password
+        password,
+        image
     });
     
     const token = user.generateAuthToken();
-    res.header('x-auth-token', token).status(200).send(_.pick(user, ['id', 'name', 'email']));
+    res.header('x-auth-token', token).status(200).send(_.pick(user, ['id', 'name', 'email', 'image']));
 });
 
 // Update a user:
@@ -58,7 +58,7 @@ router.put('/:id', auth, async (req, res) => {
     // If this is not the user or an admin, don't update.
     if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
-    let { name, email, password } = _.pick(req.body, ['name', 'email', 'password']);
+    let { name, email, password, image } = _.pick(req.body, ['name', 'email', 'password', 'image']);
     
     // If email already exists anywhere in the system.
     let userWithEmail = await User.findOne({ where: { email: email }});
@@ -72,13 +72,14 @@ router.put('/:id', auth, async (req, res) => {
         { 
             name: name,
             email: email,
-            password: password
+            password: password,
+            image: image
         },
         { where: { id: req.params.id }});
 
     user = await User.findByPk(req.params.id);
 
-    res.send(_.pick(user, ['id', 'name', 'email']));
+    res.send(_.pick(user, ['id', 'name', 'email', 'image']));
 });
 
 // Delete a user
@@ -96,7 +97,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
     });
 
-    res.status(200).send(_.pick(user, ['id', 'name', 'email']));
+    res.status(200).send(_.pick(user, ['id', 'name', 'email', 'image']));
 });
 
 // Extra Routes
