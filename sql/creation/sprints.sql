@@ -20,7 +20,7 @@ CREATE TABLE public.sprints
     CONSTRAINT "project id" FOREIGN KEY (id)
         REFERENCES public.projects (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE CASCADE
 )
 WITH (
     OIDS = FALSE

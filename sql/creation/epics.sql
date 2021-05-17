@@ -6,6 +6,10 @@ CREATE SEQUENCE epics_id_seq
     NO MINVALUE
     NO MAXVALUE;
 
+-- Table: public.epics
+
+-- DROP TABLE public.epics;
+
 CREATE TABLE public.epics
 (
     id integer NOT NULL DEFAULT nextval('epics_id_seq'::regclass),
@@ -20,15 +24,15 @@ CREATE TABLE public.epics
     CONSTRAINT "asignee id" FOREIGN KEY (asignee)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
+        ON DELETE SET NULL,
     CONSTRAINT "project id" FOREIGN KEY (project)
         REFERENCES public.projects (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
+        ON DELETE CASCADE,
     CONSTRAINT "reporter id" FOREIGN KEY (reporter)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE SET NULL
 )
 WITH (
     OIDS = FALSE

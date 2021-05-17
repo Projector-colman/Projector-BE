@@ -54,3 +54,5 @@ router.delete('/:id', auth, async (req, res) => {
 
     res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime', 'status']));
 });
+
+module.exports = router;

@@ -6,6 +6,10 @@ CREATE SEQUENCE issues_id_seq
     NO MINVALUE
     NO MAXVALUE;
 
+-- Table: public.issues
+
+-- DROP TABLE public.issues;
+
 CREATE TABLE public.issues
 (
     id integer NOT NULL DEFAULT nextval('issues_id_seq'::regclass),
@@ -24,18 +28,15 @@ CREATE TABLE public.issues
     CONSTRAINT "asignee id" FOREIGN KEY (asignee)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
+        ON DELETE NO ACTION,
     CONSTRAINT "epic id" FOREIGN KEY (epic)
         REFERENCES public.epics (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
+        ON DELETE CASCADE,
     CONSTRAINT "reporter id" FOREIGN KEY (reporter)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID
+        ON DELETE SET NULL
 )
 WITH (
     OIDS = FALSE

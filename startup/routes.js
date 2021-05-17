@@ -11,8 +11,8 @@ const homeRouter = require('../routes/home');
 const projectRouter = require('../routes/projects');
 const epicRouter = require('../routes/epics');
 const issueRouter = require('../routes/issues');
-const commentRouter = require('../routes/issues');
-const sprintRouter = require('../routes/issues');
+const commentRouter = require('../routes/comments');
+const sprintRouter = require('../routes/sprints');
 
 module.exports = function(app) {
     app
