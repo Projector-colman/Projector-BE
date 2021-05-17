@@ -130,7 +130,7 @@ router.get('/:id/issues/assignee', auth, async (req, res) => {
         order: [[ 'name', 'ASC' ]] 
     });
 
-    issues.map(issue => issue.asignee = user.name);
+    issues.map(issue => issue.asignee = {id : issue.asignee, name: user.name});
     res.status(200).send(issues);
 });
 

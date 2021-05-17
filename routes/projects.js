@@ -160,7 +160,7 @@ router.get('/:id/issues', auth, async (req, res) => {
 
     let data = await Promise.all(users);
     
-    data.forEach((user, i) => issues[i].asignee = user.name);
+    data.forEach((user, i) => issues[i].asignee = {id: issues[i].asignee, name : user.name});
 
     res.status(200).send(issues);
 });
