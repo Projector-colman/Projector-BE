@@ -77,5 +77,15 @@ insertUnique = (stack, toInsert) => {
     return stack;
 }
 
+issueIdtoIssueObject = (graph, ids) => {
+    let fullGraph = {}
+    ids.forEach(id => {
+        fullGraph[id] = graph[id];
+    });
+
+    return fullGraph;
+}
+
 module.exports.topologicalSort = topologicalSort;
 module.exports.findSubGraphs = findSubGraphs;
+module.exports.issueIdtoIssueObject = issueIdtoIssueObject;

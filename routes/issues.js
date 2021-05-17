@@ -8,9 +8,16 @@ const router = express.Router();
 // Get all issues
 // Only admin can get it.
 router.get('/', [auth, admin], async (req, res) => {
+    let users = [];
+    
     const filter = _.pick(req.query, ['id', 'epic', 'asignee', 'priority', 'sprint', 'status', 'name']);
     const issues = await Issue.findAll({ where: filter,
                                          order: [[ 'name', 'ASC' ]] });
+    issues.forEach(issue => users.push(issue.getUser()));
+
+    let data = await Promise.all(users);
+    
+    data.forEach((user, i) => issues[i].asignee = {id: issues[i].asignee, name : user.name});
     res.send(issues);
 });
 

@@ -5,7 +5,7 @@ const admin = require('../middleware/admin');
 const { Sprint, validate } = require('../models/sprint');
 const { Project } = require('../models/project');
 const router = express.Router();
-const { findSubGraphs, topologicalSort } = require('../utils/graphs');
+const { findSubGraphs, topologicalSort, issueIdtoIssueObject } = require('../utils/graphs');
 
 // Get all comments
 // Only admin can get it.
@@ -101,15 +101,10 @@ router.post('/plan', async (req, res) => {
     let subGraphsIndexes = findSubGraphs(issuesGraph);
 
     subGraphsIndexes.forEach(graphIndexes => {
-        let fullGraph = {};
-        graphIndexes.forEach(index => {
-            fullGraph[index] = issuesGraph[index];
-        })
+        let fullGraph = issueIdtoIssueObject(issuesGraph, graphIndexes);
         subGraphs.push(topologicalSort(fullGraph));
     })
-
     console.log(subGraphs);
-
     res.status(400).send('something went wrong');
 });
 
