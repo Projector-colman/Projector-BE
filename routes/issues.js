@@ -40,12 +40,12 @@ router.post('/', auth, async (req, res) => {
         status
     });
 
-    // if (blockerId) { 
-    //     blockerIssue = await Issue.findByPk(blockerId);
-    //     if (!blockerIssue) return res.status(400).send('Blocking issue does not exist.');
+     if (blockerId) { 
+         blockerIssue = await Issue.findByPk(blockerId);
+         if (!blockerIssue) return res.status(400).send('Blocking issue does not exist.');
 
-    //     issue.createBlocker({ blocker: blockerId, blocked: issue.id });
-    // }
+         issue.createBlocker({ blocker: blockerId, blocked: issue.id });
+     }
 
     res.status(200).send(_.pick(issue, ['id', 'name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']));
 })
