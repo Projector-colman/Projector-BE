@@ -51,7 +51,7 @@ findSubGraphs = (graph) => {
         subGraphs[subGraphIndex].push(+v);
         while(Q.length > 0) {
             let w = Q.shift();
-            let neighbors = graph[w].blocking;
+            let neighbors = graph[w].blocking.slice(); // slice is to copy by val instead of by ref
             neighbors = insertUnique(neighbors, graph[w].blockedBy)
             neighbors.forEach(x => {
                 if(subGraphs[subGraphIndex].indexOf(+x) < 0) {

@@ -59,7 +59,7 @@ router.delete('/:id', auth, async (req, res) => {
 router.post('/plan', async (req, res) => {
     let issues = [];
     let blockedBy = [], blocking = [];
-    let graph = {};
+    let issuesGraph = {};
     
     let { projectID, workTime } = _.pick(req.body, ['projectID', 'workTime']); 
 
@@ -84,26 +84,33 @@ router.post('/plan', async (req, res) => {
 
     // build nodes
     issues.forEach(issue => {
-        graph[issue.id] = { cost: issue.storyPoints, status: issue.status, value: issue.storyPoints, blocking : [], blockedBy : []};
+        issuesGraph[issue.id] = { cost: issue.storyPoints, status: issue.status, value: issue.storyPoints, blocking : [], blockedBy : []};
     });
     
     // build vertices
     issues.forEach((issue, i) => {
         blockedData[i].forEach(blocked => {
-            graph[blocked.id].blockedBy.push(issue.id);
+            issuesGraph[blocked.id].blockedBy.push(issue.id);
         });
         blockingData[i].forEach(blocks => {
-            graph[blocks.id].blocking.push(issue.id);
+            issuesGraph[blocks.id].blocking.push(issue.id);
         })
     });
-    let sortedArray = []// topologicalSort(graph);
-    findSubGraphs(graph);
 
-    if(sortedArray.length == 0) {
-        res.status(400).send('something went wrong');
-    } else {
-        res.status(200).send(sortedArray)
-    }
+    let subGraphs = [];
+    let subGraphsIndexes = findSubGraphs(issuesGraph);
+
+    subGraphsIndexes.forEach(graphIndexes => {
+        let fullGraph = {};
+        graphIndexes.forEach(index => {
+            fullGraph[index] = issuesGraph[index];
+        })
+        subGraphs.push(topologicalSort(fullGraph));
+    })
+
+    console.log(subGraphs);
+
+    res.status(400).send('something went wrong');
 });
 
 module.exports = router;
