@@ -4,20 +4,21 @@
 
 CREATE TABLE public.linked_issues
 (
-    id integer NOT NULL,
     blocker integer NOT NULL,
     blocked integer NOT NULL,
     "createdAt" date,
     "updatedAt" date,
-    CONSTRAINT linked_issues_pkey PRIMARY KEY (id),
-    CONSTRAINT "blocked id" FOREIGN KEY (id)
+    CONSTRAINT "linked_issues_pkey" PRIMARY KEY ("blocker", "blocked"),
+    CONSTRAINT "blocked id" FOREIGN KEY (blocked)
         REFERENCES public.issues (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT "blocker id" FOREIGN KEY (id)
+        ON DELETE CASCADE
+        NOT VALID,
+    CONSTRAINT "blocker id" FOREIGN KEY (blocker)
         REFERENCES public.issues (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE CASCADE
+        NOT VALID
 )
 WITH (
     OIDS = FALSE
@@ -26,8 +27,3 @@ TABLESPACE pg_default;
 
 ALTER TABLE public.linked_issues
     OWNER to projector;
-
-COMMENT ON CONSTRAINT "blocked id" ON public.linked_issues
-    IS 'The ID of the issue that is blocked';
-COMMENT ON CONSTRAINT "blocker id" ON public.linked_issues
-    IS 'The ID of the blocking issue';
