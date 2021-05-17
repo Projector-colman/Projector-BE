@@ -12,13 +12,11 @@ CREATE TABLE public."UserProjects"
     CONSTRAINT "project id" FOREIGN KEY ("ProjectId")
         REFERENCES public.projects (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
+        ON DELETE CASCADE,
     CONSTRAINT "user id" FOREIGN KEY ("UserId")
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID
+        ON DELETE CASCADE
 )
 WITH (
     OIDS = FALSE

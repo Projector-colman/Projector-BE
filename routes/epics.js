@@ -26,13 +26,13 @@ router.post('/', auth, async (req, res) => {
     let epic = await Epic.findOne({ where: { name: name, project: project }});
     if (epic) return res.status(400).send('An epic in this project with this name is already exists');
 
-    const reporter = req.user.id;
+    let reporter = req.user.id;
     epic = await Epic.create({
-        name,
-        description,
-        project,
-        reporter,
-        asignee
+        name: name,
+        description: description,
+        project: project,
+        reporter: reporter,
+        asignee: asignee
     });
 
     res.status(200).send(_.pick(epic, ['id', 'name', 'description', 'project', 'reporter', 'asignee']));
@@ -73,11 +73,13 @@ router.delete('/:id', auth, async (req, res) => {
     // If this is not the owner or admin, don't delete.
     if ((epic.reporter != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
-    await Epic.destroy({
-        where: {
-          id: req.params.id
-        }
+    issues = await epic.getIssues();
+    await issues.forEach(issue => {
+        issue.removeComments(); 
+        issue.destroy();
     });
+
+    await epic.destroy();
 
     res.status(200).send(_.pick(epic, ['id', 'name', 'description', 'project', 'reporter', 'asignee']));
 });

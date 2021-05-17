@@ -43,7 +43,7 @@ Comment.init({
 }, {
   sequelize: db,
   modelName: 'Comment',
-  tableName: 'issue_comments'
+  tableName: 'comments'
 });
 
 // Relations
@@ -53,14 +53,13 @@ Comment.belongsTo(User, { foreignKey: { name: 'writer' } });
 
 // issues have many comments
 Issue.hasMany(Comment, { foreignKey: { name: 'issue' } });
-Comment.belongsTo(Issue, { foreignKey: { name: 'issue' } });
+Comment.belongsTo(Issue, { foreignKey: { name: 'issue' }});
 
 // Object validation.
 function validateComment(comment) {
   const schema = Joi.object({
     description: Joi.string().max(255),
     issue: Joi.number().required(),
-    writer: Joi.number().required(),
   });
 
   return schema.validate(comment);

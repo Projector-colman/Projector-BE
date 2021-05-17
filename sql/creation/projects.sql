@@ -23,7 +23,7 @@ CREATE TABLE public.projects
     CONSTRAINT owner_id FOREIGN KEY (owner)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE SET NULL
 )
 WITH (
     OIDS = FALSE

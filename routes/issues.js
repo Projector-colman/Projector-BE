@@ -96,11 +96,7 @@ router.delete('/:id', auth, async (req, res) => {
     // If this is not the owner, don't delete.
     if ((issue.reporter != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
-    await Issue.destroy({
-        where: {
-          id: req.params.id
-        }
-    });
+    await issue.destroy();
 
     res.status(200).send(_.pick(issue, ['name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']));
 });
