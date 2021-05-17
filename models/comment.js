@@ -52,10 +52,7 @@ User.hasMany(Comment, { foreignKey: { name: 'writer' } });
 Comment.belongsTo(User, { foreignKey: { name: 'writer' } });
 
 // issues have many comments
-Issue.hasMany(Comment, { 
-  onDelete: 'RESTRICT', 
-  foreignKey: { name: 'issue' } 
-});
+Issue.hasMany(Comment, { foreignKey: { name: 'issue' } });
 Comment.belongsTo(Issue, { foreignKey: { name: 'issue' }});
 
 // Object validation.
