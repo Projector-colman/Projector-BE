@@ -19,7 +19,22 @@ Sprint.init({
         key: 'id'
     }
   },
+  storyPoints: {
+    type: DataTypes.INTEGER,
+    allowNull: false, // won't allow null
+    validate: {
+      isInt: true, // checks for valid integers
+      min: 1, // only allow values >= 1
+    },
+  },
   startTime: {
+    type: DataTypes.DATE,
+    allowNull: false, // won't allow null
+    validate: {
+      isDate: true,
+    }
+  },
+  endTime: {
     type: DataTypes.DATE,
     allowNull: false, // won't allow null
     validate: {
