@@ -37,6 +37,16 @@ router.post('/', auth, async (req, res) => {
     res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime', 'status']));
 });
 
+// Get all issues associated to this sprint
+router.get('/:id/issues', auth, async (req, res) => {
+    let sprint = await Sprint.findByPk(req.params.id);
+    if (!sprint) return res.status(400).send('Sprint does not exist.');
+
+    let issues = await sprint.getIssues();
+
+    res.status(200).send(issues);
+});
+
 // Delete a sprint
 // Only the owner and admin
 router.delete('/:id', auth, async (req, res) => {
@@ -107,5 +117,6 @@ router.post('/plan', async (req, res) => {
     console.log(subGraphs);
     res.status(400).send('something went wrong');
 });
+
 
 module.exports = router;

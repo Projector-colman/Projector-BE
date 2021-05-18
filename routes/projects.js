@@ -175,7 +175,7 @@ router.get('/:id/sprints', auth, async (req, res) => {
 
     sprints = await project.getSprints();
 
-    res.status(200).send(_.map(sprints, _.partialRight(_.pick, ['id', 'startTime'])));
+    res.status(200).send(_.map(sprints, _.partialRight(_.pick, ['id', 'startTime', 'endTime', 'storyPoints', 'status'])));
 });
 
 module.exports = router;
