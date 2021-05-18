@@ -42,7 +42,7 @@ Sprint.init({
     }
   },
   status: {
-    type: DataTypes.ENUM('active', 'planned', 'backlog'),
+    type: DataTypes.ENUM('active', 'planned', 'backlog', 'done'),
     allowNull: true, // will allow null
     defaultValue: null
   }
@@ -64,7 +64,7 @@ function validateSprint(sprint) {
     storyPoints: Joi.number().required(),
     startTime: Joi.date().required(),
     endTime: Joi.date().required(),
-    status: Joi.string().valid('active', 'planned', 'backlog'),
+    status: Joi.string().valid('active', 'planned', 'backlog', 'done'),
   });
 
   return schema.validate(sprint);
