@@ -10,7 +10,7 @@ const { findSubGraphs, topologicalSort, issueIdtoIssueObject } = require('../uti
 // Get all comments
 // Only admin can get it.
 router.get('/', [auth, admin], async (req, res) => {
-    const filter = _.pick(req.query, ['id', 'project', 'startTime', 'status','createdAt', 'updatedAt']);
+    const filter = _.pick(req.query, ['id', 'project', 'startTime', 'endTime', 'status','createdAt', 'updatedAt']);
     const sprints = await Sprint.findAll({ 
         where: filter,
         order: [[ 'createdAt', 'ASC' ]] 
@@ -26,7 +26,7 @@ router.post('/', auth, async (req, res) => {
 
     if (error) return res.status(400).send(error.details[0].message);
 
-    let { project, startTime, status } = _.pick(req.body, ['project', 'startTime', 'status']);
+    let { project, startTime, status } = _.pick(req.body, ['project', 'startTime', 'endTime', 'status']);
     
     sprint = await Sprint.create({
         project,
@@ -34,7 +34,7 @@ router.post('/', auth, async (req, res) => {
         status
     });
     
-    res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime', 'status']));
+    res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime', 'endTime', 'status']));
 });
 
 // Get all issues associated to this sprint
@@ -63,7 +63,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
     });
 
-    res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime', 'status']));
+    res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime', 'endTime', 'status']));
 });
 
 router.post('/plan', async (req, res) => {

@@ -61,12 +61,14 @@ Sprint.belongsTo(Project, { foreignKey: { name: 'project' } });
 function validateSprint(sprint) {
   const schema = Joi.object({
     project: Joi.number().required(),
-    date: Joi.date().required(),
+    storyPoints: Joi.number().required(),
+    startTime: Joi.date().required(),
+    endTime: Joi.date().required(),
     status: Joi.string().valid('active', 'planned', 'backlog'),
   });
 
   return schema.validate(sprint);
-}
+};
 
 // Exports
 module.exports.Sprint = Sprint;
