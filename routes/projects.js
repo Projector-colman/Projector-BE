@@ -131,7 +131,8 @@ router.delete('/:id/users/:userId', auth, async (req, res) => {
 
     // If this is not the owner, don't delete.
     if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
-
+    if(req.params.userId == project.owner) return res.status(401).send('Cant delete project owner'); 
+    
     user = await project.getUsers({
         where: {
             id: req.params.userId

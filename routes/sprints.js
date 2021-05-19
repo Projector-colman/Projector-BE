@@ -4,6 +4,7 @@ const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const { Sprint, validate } = require('../models/sprint');
 const { Project } = require('../models/project');
+const { Issue } = require('../models/issue');
 const router = express.Router();
 const { findSubGraphs, topologicalSort, issueIdtoIssueObject } = require('../utils/graphs');
 
@@ -70,7 +71,11 @@ router.post('/plan', async (req, res) => {
     let issues = [];
     let blockedBy = [], blocking = [];
     let issuesGraph = {};
-    
+    let issuesClusterDetails = [];
+
+    let sortedSubGraphs = [];
+    let sortedGraph = [];
+
     let { projectID, workTime } = _.pick(req.body, ['projectID', 'workTime']); 
 
     let project = await Project.findByPk(projectID);
@@ -107,16 +112,64 @@ router.post('/plan', async (req, res) => {
         })
     });
 
-    let subGraphs = [];
-    let subGraphsIndexes = findSubGraphs(issuesGraph);
-
-    subGraphsIndexes.forEach(graphIndexes => {
+    // Finding all clusters of blocking issues
+    // Topologicaly sorting all issue clusters
+    findSubGraphs(issuesGraph).forEach(graphIndexes => {
         let fullGraph = issueIdtoIssueObject(issuesGraph, graphIndexes);
-        subGraphs.push(topologicalSort(fullGraph));
-    })
-    console.log(subGraphs);
+        sortedSubGraphs.push(topologicalSort(fullGraph));
+    });
+
+    // Building the graph from the sorted issues indexes
+    sortedSubGraphs.forEach(graphIndexes => {
+        sortedGraph.push(issueIdtoIssueObject(issuesGraph, graphIndexes));
+    });
+    
+    sortedGraph.forEach((issuesCluster, i) => {
+        let clusterCost = 0;
+        let clusterValue = 0;
+        let issuesID = Object.keys(issuesCluster);
+        issuesID.forEach(issueId => {
+            // Add the issue const
+            clusterValue += issuesCluster[issueId].cost;
+            clusterCost += issuesCluster[issueId].cost;
+            // Add the issue Blockers cost times the status multiplier 
+            // to-do : 1.2, done 1.5
+            issuesCluster[issueId].blockedBy.forEach(blocker => {
+                if(issuesCluster[blocker].status == 'done') {
+                    // Add cost to cluster
+                    clusterValue += (issuesCluster[blocker].cost * 1.5);
+                } else {
+                    clusterValue += (issuesCluster[blocker].cost * 1.2);
+                }
+            });
+        });
+        issuesClusterDetails.push({cost : clusterCost, value : clusterValue});
+    });
+    console.log(issuesClusterDetails)
     res.status(400).send('something went wrong');
 });
 
+let createPlannedSprint = async (project) => {
+    sprint = await Sprint.create({
+        project,
+        startTime : undefined,
+        status: "planned"
+    });
+    return sprint;
+}
+
+let updateIssue = async (assignee) => {
+    let issue = await Issue.findByPk(req.params.id);
+    if (!issue) return res.status(400).send('Issue does not exist.');
+
+    await Issue.update(
+        { 
+            asignee: assignee,
+        },
+        { where: { id: req.params.id }});
+
+    issue = await Issue.findByPk(req.params.id);
+    return true;
+}
 
 module.exports = router;

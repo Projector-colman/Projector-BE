@@ -116,5 +116,4 @@ router.get('/status/:status', async (req, res) => {
     res.send(issues);
 });
 
-
 module.exports = router;

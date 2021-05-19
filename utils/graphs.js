@@ -1,12 +1,16 @@
+const _ = require('lodash');
+
 topologicalSort = (graph) => {
+    let copyGraph = _.cloneDeep(graph);
+
     let roots = []
     let sortedElements = [];
     let isCyclic = false;
-    let nodes = Object.keys(graph);
+    let nodes = Object.keys(copyGraph);
 
     // Find roots
     nodes.forEach(node => {
-        if(graph[node].blockedBy.length == 0) {
+        if(copyGraph[node].blockedBy.length == 0) {
             roots.push(node);
         }
     })
@@ -14,11 +18,11 @@ topologicalSort = (graph) => {
     while (roots.length > 0) {
         let n = +roots.pop();
         sortedElements.push(n);
-        graph[n].blocking.forEach(m => {
+        copyGraph[n].blocking.forEach(m => {
             // Remove vertice (each node saves the vertice)
-            graph[n].blocking.splice(graph[n].blocking.indexOf(m), 1)
-            graph[m].blockedBy.splice(graph[m].blockedBy.indexOf(n), 1)
-            if(graph[m].blockedBy.length == 0) {
+            copyGraph[n].blocking.splice(copyGraph[n].blocking.indexOf(m), 1)
+            copyGraph[m].blockedBy.splice(copyGraph[m].blockedBy.indexOf(n), 1)
+            if(copyGraph[m].blockedBy.length == 0) {
                 roots.push(m);
             }
         });
@@ -26,7 +30,7 @@ topologicalSort = (graph) => {
     
     nodes.forEach(node => {
         // if there are still vertices then theres a cycle
-        if(graph[node].blockedBy.length > 0 || graph[node].blocking.length > 0) {
+        if(copyGraph[node].blockedBy.length > 0 || copyGraph[node].blocking.length > 0) {
             isCyclic = true;
         }
     });
