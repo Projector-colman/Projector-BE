@@ -3,6 +3,10 @@ const _ = require('lodash');
 const { Project, validate } = require('../models/project');
 const auth = require('../middleware/auth');
 const { User } = require('../models/user');
+const { beforeFindAfterExpandIncludeAll } = require('../startup/db');
+const { Epic } = require('../models/epic');
+const { Issue } = require('../models/issue');
+const { Sprint } = require('../models/sprint');
 const router = express.Router();
 
 // Get all projects
@@ -143,24 +147,39 @@ router.delete('/:id/users/:userId', auth, async (req, res) => {
 
 // Get all issues associated to this project
 router.get('/:id/issues', auth, async (req, res) => {
-    let issues = [];
-    let users = [];
     
     let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
-    epics = await project.getEpics();
+    const projectData = await Project.findOne({
+        where:{
+            'id': req.params.id
+        },
+        include: {
+            model: Epic,
+            include: {
+                model: Issue,
+                include: {
+                    model: Sprint,
+                    attributes: ['status']
+                }
+            }
+        }
+    });
 
-    for(i = 0; i < epics.length; i++) {
-        epicIssues = await epics[i].getIssues();
-        issues.push(...epicIssues)
-    }
+    var issues = [];
 
-    issues.forEach(issue => users.push(issue.getUser()));
+    projectData['Epics'].forEach(epic => {
+        epic['Issues'].forEach(issue => {
+            if (issue.Sprint) {
+                let sprintStatus = issue.Sprint['status'];
+                issue.setDataValue('sprintStatus', sprintStatus);
+            }
+            issues.push(issue);
+        });
+    });
 
-    let data = await Promise.all(users);
-    
-    data.forEach((user, i) => issues[i].asignee = {id: issues[i].asignee, name : user.name});
+    await Promise.all(issues);
 
     res.status(200).send(issues);
 });
