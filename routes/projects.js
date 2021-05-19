@@ -159,10 +159,14 @@ router.get('/:id/issues', auth, async (req, res) => {
             model: Epic,
             include: {
                 model: Issue,
-                include: {
+                include: [{
                     model: Sprint,
                     attributes: ['status']
-                }
+                },
+                {
+                    model: User,
+                    attributes: ['id', 'name']
+                }]
             }
         }
     });
