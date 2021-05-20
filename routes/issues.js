@@ -1,6 +1,9 @@
 const express = require('express');
 const _ = require('lodash');
 const { Issue, validate, validateStatus } = require('../models/issue');
+const { Sprint } = require('../models/sprint');
+const { Epic } = require('../models/epic');
+const { Project } = require('../models/project');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const router = express.Router();
@@ -114,6 +117,51 @@ router.get('/status/:status', async (req, res) => {
         { order: [[ 'name', 'ASC' ]] }
     );
     res.send(issues);
+});
+
+// Update an issue
+// Only Owner of the issue and admin.
+router.put('/:id/sprint', auth, async (req, res) => {
+    let error = false;
+
+    let issue = await Issue.findByPk(req.params.id, {
+        include: {
+            model: Epic,
+            attributes : ['project']
+        }
+    });
+
+    if (!issue) return res.status(400).send('Issue does not exist.');
+
+    // Should we change reporter also ?
+    let { sprintStatus } = _.pick(req.body, ['sprintStatus']);
+
+    if(sprintStatus == 'backlog') {
+        await Issue.update({
+            'sprint' : null
+        },
+        { where : { id : req.params.id }});
+    } 
+
+    else {
+        let sprint = await Sprint.findOne(
+            { where: { project : issue.Epic['project'], 
+                       status  : sprintStatus  }});
+        
+        if(sprint) {
+            await Issue.update({
+                'sprint' : sprint.id
+            },
+            { where : { id : req.params.id }});
+        } else {
+            error = true;
+        }
+    }
+    if(error) {
+        res.status(400).send('no such sprint');
+    } else {
+        res.status(200).send({data: 'done'});
+    }
 });
 
 module.exports = router;

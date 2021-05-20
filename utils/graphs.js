@@ -122,9 +122,9 @@ getGraphClustersValue = (graph) => {
             issuesCluster[issueId].blockedBy.forEach(blocker => {
                 if(issuesCluster[blocker].status == 'done') {
                     // Add cost to cluster
-                    clusterValue += (issuesCluster[blocker].priority * 1.2);
+                    clusterValue += (1 + (issuesCluster[blocker].priority * 0.1) * 1.2);
                 } else {
-                    clusterValue += (issuesCluster[blocker].priority);
+                    clusterValue += (1 + (issuesCluster[blocker].priority * 0.1));
                 }
             });
         });

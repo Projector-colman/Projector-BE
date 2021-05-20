@@ -3,11 +3,11 @@ const _ = require('lodash');
 const { Project, validate } = require('../models/project');
 const auth = require('../middleware/auth');
 const { User } = require('../models/user');
-const { beforeFindAfterExpandIncludeAll } = require('../startup/db');
 const { Epic } = require('../models/epic');
 const { Issue } = require('../models/issue');
 const { Sprint } = require('../models/sprint');
 const router = express.Router();
+const { Op } = require('sequelize');
 
 // Get all projects
 // Everyone can get it.
@@ -147,31 +147,55 @@ router.delete('/:id/users/:userId', auth, async (req, res) => {
 });
 
 // Get all issues associated to this project
-router.get('/:id/issues', auth, async (req, res) => {
-    
+router.get('/:id/issues', async (req, res) => {
+    let projectData;
+
     let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
-    const projectData = await Project.findOne({
-        where:{
-            'id': req.params.id
-        },
-        include: {
-            model: Epic,
-            include: {
-                model: Issue,
-                include: [{
-                    model: Sprint,
-                    attributes: ['status']
-                },
-                {
-                    model: User,
-                    attributes: ['id', 'name']
-                }]
-            }
-        }
-    });
+    let sprintFilter = _.pick(req.query, ['status']);
 
+    if(sprintFilter.status == 'backlog') {
+        projectData = await Project.findOne({
+            where:{
+                'id': req.params.id,
+            },
+            include: {
+                model: Epic,
+                include: {
+                    model: Issue,
+                    where : {sprint : null},
+                    include: [
+                    {
+                        model: User,
+                        attributes: ['id', 'name']
+                    }]
+                }
+            }
+        });
+    } 
+    else {  
+        projectData = await Project.findOne({
+            where:{
+                'id': req.params.id,
+            },
+            include: {
+                model: Epic,
+                include: {
+                    model: Issue,
+                    include: [{
+                        model: Sprint,
+                        attributes: ['status'],
+                        where : sprintFilter
+                    },
+                    {
+                        model: User,
+                        attributes: ['id', 'name']
+                    }]
+                }
+            }
+        });
+    }
     var issues = [];
 
     projectData['Epics'].forEach(epic => {

@@ -6,15 +6,13 @@ const { Sprint, validate } = require('../models/sprint');
 const { Project } = require('../models/project');
 const { Issue } = require('../models/issue');
 const router = express.Router();
-const { findSubGraphs, 
-        topologicalSort,
-        issueIdtoIssueObject,
-        getGraphClustersValue,
+
+const { getGraphClustersValue,
         findHighestValueCluster } = require('../utils/graphs');
 
 // Get all comments
 // Only admin can get it.
-router.get('/', [auth, admin], async (req, res) => {
+router.get('/', auth, async (req, res) => {
     const filter = _.pick(req.query, ['id', 'project', 'startTime', 'endTime', 'status','createdAt', 'updatedAt']);
     const sprints = await Sprint.findAll({ 
         where: filter,
