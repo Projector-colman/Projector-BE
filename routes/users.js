@@ -7,6 +7,69 @@ const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const router = express.Router();
 
+const multer = require('multer');
+const sharp = require('sharp');
+
+//multer options
+const upload = multer({
+    limits: {
+        fileSize: 1050000,
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(png|jpg|jpeg)$/)){
+            cb(new Error('Image type incorrect'))
+        }
+        cb(undefined, true)
+    }
+});
+
+router.get('/:id/image', [ auth ], async (req, res) => {
+    let user = await User.findByPk(req.params.id);
+    if (!user) return res.status(400).send('User does not exist.');
+
+    res.set('Content-Type', 'image/png').send(user.image);
+});
+
+router.put('/:id/image', [ auth, upload.single('upload') ], async (req, res) => {
+    let user = await User.findByPk(req.params.id);
+    if (!user) return res.status(400).send('User does not exist.');
+
+    // If this is not the user or an admin, don't update.
+    if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    if (!req.file) return res.status(400).send('No file was given.');
+
+    const buffer = await sharp(req.file.buffer).resize({ width: 100, height: 100}).png().toBuffer();
+    
+    await User.update(
+        { image: buffer },
+        { where: { id: req.params.id }}
+    );
+
+    user = await User.findByPk(req.params.id);
+
+    res.set('Content-Type', 'image/png').send(user.image);
+});
+
+router.delete('/:id/image', [ auth ], async (req, res) => {
+    let user = await User.findByPk(req.params.id);
+    if (!user) return res.status(400).send('User does not exist.');
+
+    // If this is not the user or an admin, don't update.
+    if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    if (!user.image) res.send(_.pick(user, ['id', 'name', 'email', 'image']));
+    
+    await User.update(
+        { image: null },
+        { where: { id: req.params.id }}
+    );
+
+    user = await User.findByPk(req.params.id);
+
+    res.set('Content-Type', 'image/png').send(user.image);
+});
+
 // // Get my details.
 router.get('/me', auth, async (req, res) => {
     const user = await User.findByPk(req.user.id, { attributes: { exclude: ['password'] } });
@@ -29,7 +92,7 @@ router.post('/', async (req, res) => {
     let user = await User.findOne({ where: { email: req.body.email }});
     if (user) return res.status(400).send('User already registered.');
 
-    let { name, email, password, image } = _.pick(req.body, ['name', 'email', 'password', 'image']);
+    let { name, email, password } = _.pick(req.body, ['name', 'email', 'password']);
     
     // Hash the password
     const salt = await bcrypt.genSalt(10);
@@ -37,12 +100,11 @@ router.post('/', async (req, res) => {
     user = await User.create({
         name,
         email,
-        password,
-        image
+        password
     });
     
     const token = user.generateAuthToken();
-    res.header('x-auth-token', token).status(200).send(_.pick(user, ['id', 'name', 'email', 'image']));
+    res.header('x-auth-token', token).status(200).send(_.pick(user, ['id', 'name', 'email']));
 });
 
 // Update a user:
@@ -51,14 +113,13 @@ router.put('/:id', auth, async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    console.log(req.params.id);
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
     // If this is not the user or an admin, don't update.
     if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
-    let { name, email, password, image } = _.pick(req.body, ['name', 'email', 'password', 'image']);
+    let { name, email, password } = _.pick(req.body, ['name', 'email', 'password']);
     
     // If email already exists anywhere in the system.
     let userWithEmail = await User.findOne({ where: { email: email }});
@@ -72,14 +133,13 @@ router.put('/:id', auth, async (req, res) => {
         { 
             name: name,
             email: email,
-            password: password,
-            image: image
+            password: password
         },
         { where: { id: req.params.id }});
 
     user = await User.findByPk(req.params.id);
 
-    res.send(_.pick(user, ['id', 'name', 'email', 'image']));
+    res.send(_.pick(user, ['id', 'name', 'email']));
 });
 
 // Delete a user
@@ -97,7 +157,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
     });
 
-    res.status(200).send(_.pick(user, ['id', 'name', 'email', 'image']));
+    res.status(200).send(_.pick(user, ['id', 'name', 'email']));
 });
 
 // Extra Routes

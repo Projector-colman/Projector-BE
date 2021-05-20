@@ -42,7 +42,7 @@ User.init({
     }
   },
   image: {
-    type: DataTypes.STRING,
+    type: DataTypes.BLOB,
     allowNull: true, // won't allow null
   },
   isAdmin: {
@@ -62,7 +62,6 @@ function validateUser(user) {
     name: Joi.string().min(2).max(255).required(),
     email: Joi.string().min(5).max(255).required().email(),
     password: Joi.string().min(5).max(255).required(),
-    //image: Joi.string()//.required()
   });
 
   return schema.validate(user);
