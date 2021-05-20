@@ -127,10 +127,14 @@ router.get('/:id/issues/assignee', auth, async (req, res) => {
 
     const issues = await Issue.findAll({ 
         where: { asignee: user.id },
-        order: [[ 'name', 'ASC' ]] 
+        order: [[ 'name', 'ASC' ]],
+        include: {
+            model: User,
+            attributes: ['id', 'name']
+        }
     });
 
-    issues.map(issue => issue.asignee = {id : issue.asignee, name: user.name});
+    issues.map(issue => issue.User = {id : issue.asignee, name: user.name});
     res.status(200).send(issues);
 });
 

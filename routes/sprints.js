@@ -99,7 +99,7 @@ router.post('/plan', async (req, res) => {
 
     // build nodes
     issues.forEach(issue => {
-        issuesGraph[issue.id] = { cost: issue.storyPoints, status: issue.status, value: issue.storyPoints, blocking : [], blockedBy : []};
+        issuesGraph[issue.id] = { cost: issue.storyPoints, status: issue.status, priority: issue.priority, blocking : [], blockedBy : []};
     });
     
     // build vertices
@@ -123,29 +123,32 @@ router.post('/plan', async (req, res) => {
     sortedSubGraphs.forEach(graphIndexes => {
         sortedGraph.push(issueIdtoIssueObject(issuesGraph, graphIndexes));
     });
-    
+
     sortedGraph.forEach((issuesCluster, i) => {
         let clusterCost = 0;
         let clusterValue = 0;
         let issuesID = Object.keys(issuesCluster);
         issuesID.forEach(issueId => {
             // Add the issue const
-            clusterValue += issuesCluster[issueId].cost;
+            clusterValue += issuesCluster[issueId].priority;
             clusterCost += issuesCluster[issueId].cost;
             // Add the issue Blockers cost times the status multiplier 
             // to-do : 1.2, done 1.5
             issuesCluster[issueId].blockedBy.forEach(blocker => {
                 if(issuesCluster[blocker].status == 'done') {
                     // Add cost to cluster
-                    clusterValue += (issuesCluster[blocker].cost * 1.5);
+                    clusterValue += (issuesCluster[blocker].priority * 1.2);
                 } else {
-                    clusterValue += (issuesCluster[blocker].cost * 1.2);
+                    clusterValue += (issuesCluster[blocker].priority);
                 }
             });
         });
-        issuesClusterDetails.push({cost : clusterCost, value : clusterValue});
+        issuesClusterDetails.push({cost : clusterCost, value : clusterValue / clusterCost});
     });
-    console.log(issuesClusterDetails)
+    console.log(sortedSubGraphs);
+    console.log(issuesClusterDetails);
+
+    
     res.status(400).send('something went wrong');
 });
 
