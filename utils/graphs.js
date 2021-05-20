@@ -90,6 +90,63 @@ issueIdtoIssueObject = (graph, ids) => {
     return fullGraph;
 }
 
+getGraphClustersValue = (graph) => {
+    let sortedSubGraphs = [];
+    let sortedGraph = [];
+    let issuesClusterDetails = [];
+
+    // Finding all clusters of blocking issues
+    // Topologicaly sorting all issue clusters
+    findSubGraphs(graph).forEach(graphIndexes => {
+        let fullGraph = issueIdtoIssueObject(graph, graphIndexes);
+        sortedSubGraphs.push(topologicalSort(fullGraph));
+    });
+
+    // Building the graph from the sorted issues indexes
+    sortedSubGraphs.forEach(graphIndexes => {
+        sortedGraph.push(issueIdtoIssueObject(graph, graphIndexes));
+    });
+
+    sortedGraph.forEach((issuesCluster, i) => {
+        let clusterCost = 0;
+        let clusterValue = 0;
+        let issuesID = Object.keys(issuesCluster);
+        let issuesDetails = [];
+        issuesID.forEach(issueId => {
+            issuesDetails.push({id: issueId, points: issuesCluster[issueId].cost})
+            // Add the issue const
+            clusterValue += issuesCluster[issueId].priority;
+            clusterCost += issuesCluster[issueId].cost;
+            // Add the issue Blockers cost times the status multiplier 
+            // to-do : 1.2, done 1.5
+            issuesCluster[issueId].blockedBy.forEach(blocker => {
+                if(issuesCluster[blocker].status == 'done') {
+                    // Add cost to cluster
+                    clusterValue += (issuesCluster[blocker].priority * 1.2);
+                } else {
+                    clusterValue += (issuesCluster[blocker].priority);
+                }
+            });
+        });
+        issuesClusterDetails.push({details: issuesDetails, value : clusterValue / clusterCost});
+    });
+    return issuesClusterDetails;
+}
+
+findHighestValueCluster = (issuesCluster) => {
+    let highestCluster = issuesCluster[0];
+    
+    issuesCluster.forEach(cluster => {
+        if(cluster.value > highestCluster.value) {
+            highestCluster = cluster;
+        }
+    });
+    issuesCluster.splice(issuesCluster.indexOf(highestCluster),1); // remove cluster
+    return highestCluster;
+}
+
 module.exports.topologicalSort = topologicalSort;
 module.exports.findSubGraphs = findSubGraphs;
 module.exports.issueIdtoIssueObject = issueIdtoIssueObject;
+module.exports.getGraphClustersValue = getGraphClustersValue;
+module.exports.findHighestValueCluster = findHighestValueCluster;

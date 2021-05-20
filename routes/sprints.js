@@ -6,7 +6,11 @@ const { Sprint, validate } = require('../models/sprint');
 const { Project } = require('../models/project');
 const { Issue } = require('../models/issue');
 const router = express.Router();
-const { findSubGraphs, topologicalSort, issueIdtoIssueObject } = require('../utils/graphs');
+const { findSubGraphs, 
+        topologicalSort,
+        issueIdtoIssueObject,
+        getGraphClustersValue,
+        findHighestValueCluster } = require('../utils/graphs');
 
 // Get all comments
 // Only admin can get it.
@@ -71,10 +75,6 @@ router.post('/plan', async (req, res) => {
     let issues = [];
     let blockedBy = [], blocking = [];
     let issuesGraph = {};
-    let issuesClusterDetails = [];
-
-    let sortedSubGraphs = [];
-    let sortedGraph = [];
 
     let { projectID, workTime } = _.pick(req.body, ['projectID', 'workTime']); 
 
@@ -111,44 +111,22 @@ router.post('/plan', async (req, res) => {
             issuesGraph[blocks.id].blocking.push(issue.id);
         })
     });
-
-    // Finding all clusters of blocking issues
-    // Topologicaly sorting all issue clusters
-    findSubGraphs(issuesGraph).forEach(graphIndexes => {
-        let fullGraph = issueIdtoIssueObject(issuesGraph, graphIndexes);
-        sortedSubGraphs.push(topologicalSort(fullGraph));
-    });
-
-    // Building the graph from the sorted issues indexes
-    sortedSubGraphs.forEach(graphIndexes => {
-        sortedGraph.push(issueIdtoIssueObject(issuesGraph, graphIndexes));
-    });
-
-    sortedGraph.forEach((issuesCluster, i) => {
-        let clusterCost = 0;
-        let clusterValue = 0;
-        let issuesID = Object.keys(issuesCluster);
-        issuesID.forEach(issueId => {
-            // Add the issue const
-            clusterValue += issuesCluster[issueId].priority;
-            clusterCost += issuesCluster[issueId].cost;
-            // Add the issue Blockers cost times the status multiplier 
-            // to-do : 1.2, done 1.5
-            issuesCluster[issueId].blockedBy.forEach(blocker => {
-                if(issuesCluster[blocker].status == 'done') {
-                    // Add cost to cluster
-                    clusterValue += (issuesCluster[blocker].priority * 1.2);
-                } else {
-                    clusterValue += (issuesCluster[blocker].priority);
+    let issuesClusterDetails = getGraphClustersValue(issuesGraph);
+    let newAssignees = [];
+    while(issuesClusterDetails.length > 0) {
+        let mostValueableCluster = findHighestValueCluster(issuesClusterDetails);
+        mostValueableCluster.details.forEach(issue => {
+            let isAssigned = false;
+            workTime.forEach(user => {
+                if(user.time > issue.points && !isAssigned) {
+                    user.time -= issue.points
+                    newAssignees.push({issue : issue.id, user : user.id})
+                    isAssigned = true;
                 }
-            });
-        });
-        issuesClusterDetails.push({cost : clusterCost, value : clusterValue / clusterCost});
-    });
-    console.log(sortedSubGraphs);
-    console.log(issuesClusterDetails);
-
-    
+            })
+        })
+    }
+    console.log(newAssignees)
     res.status(400).send('something went wrong');
 });
 
