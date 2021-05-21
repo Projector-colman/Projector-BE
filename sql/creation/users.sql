@@ -17,7 +17,7 @@ CREATE TABLE public.users
     "isAdmin" boolean NOT NULL,
     "createdAt" date,
     "updatedAt" date,
-    image character varying(512) COLLATE pg_catalog."default",
+    image bytea,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT email_uqky UNIQUE (email)
 )

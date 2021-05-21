@@ -1,13 +1,5 @@
 -- Table: public.issues
 
-CREATE SEQUENCE issues_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE;
-
--- Table: public.issues
-
 -- DROP TABLE public.issues;
 
 CREATE TABLE public.issues
@@ -29,14 +21,15 @@ CREATE TABLE public.issues
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT "epic id" FOREIGN KEY (epic)
-        REFERENCES public.epics (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE,
     CONSTRAINT "reporter id" FOREIGN KEY (reporter)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
+        ON DELETE SET NULL,
+    CONSTRAINT "sprint id" FOREIGN KEY (sprint)
+        REFERENCES public.sprints (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
         ON DELETE SET NULL
+        NOT VALID
 )
 WITH (
     OIDS = FALSE
@@ -48,7 +41,5 @@ ALTER TABLE public.issues
 
 COMMENT ON CONSTRAINT "asignee id" ON public.issues
     IS 'user assigned with this issue';
-COMMENT ON CONSTRAINT "epic id" ON public.issues
-    IS 'epic father of this issue';
 COMMENT ON CONSTRAINT "reporter id" ON public.issues
     IS 'reporter of this issue';
