@@ -2,6 +2,7 @@ const Joi = require('joi');
 const { DataTypes, Model } = require('sequelize');
 const db = require('../startup/db');
 const { Project } = require('./project');
+const { User } = require('./user');
 
 class Sprint extends Model {};
 
@@ -29,14 +30,14 @@ Sprint.init({
   },
   startTime: {
     type: DataTypes.DATE,
-    allowNull: false, // won't allow null
+    allowNull: true,
     validate: {
       isDate: true,
     }
   },
   endTime: {
     type: DataTypes.DATE,
-    allowNull: false, // won't allow null
+    allowNull: true,
     validate: {
       isDate: true,
     }
@@ -56,6 +57,9 @@ Sprint.init({
 // project have many sprints
 Project.hasMany(Sprint, { foreignKey: { name: 'project' } });
 Sprint.belongsTo(Project, { foreignKey: { name: 'project' } });
+
+User.belongsToMany(Sprint, { through: 'UserSprints' });
+Sprint.belongsToMany(User, { through: 'UserSprints' });
 
 // Sprint validation.
 function validateSprint(sprint) {

@@ -11,8 +11,8 @@ CREATE SEQUENCE sprints_id_seq
 CREATE TABLE public.sprints
 (
     id integer NOT NULL DEFAULT nextval('sprints_id_seq'::regclass),
-    project integer NOT NULL,
-    "startTime" date NOT NULL,
+    project integer,
+    "startTime" date,
     "createdAt" date,
     "updatedAt" date,
     status character varying COLLATE pg_catalog."default",
