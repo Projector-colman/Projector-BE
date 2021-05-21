@@ -5,10 +5,12 @@ const admin = require('../middleware/admin');
 const { Sprint, validate } = require('../models/sprint');
 const { Project } = require('../models/project');
 const { Issue } = require('../models/issue');
-const router = express.Router();
+const { Epic } = require('../models/epic');
 
+const router = express.Router();
 const { getGraphClustersValue,
         findHighestValueCluster } = require('../utils/graphs');
+const { Op } = require('sequelize');
 
 // Get all comments
 // Only admin can get it.
@@ -69,6 +71,48 @@ router.delete('/:id', auth, async (req, res) => {
     res.status(200).send(_.pick(sprint, ['id', 'project', 'startTime', 'endTime', 'status']));
 });
 
+// Delete a sprint
+// Only the owner and admin
+router.post('/start', auth, async (req, res) => {
+    let { projectID } = _.pick(req.body, ['project']);
+
+    project = await Project.findByPk(projectID);
+
+    // If this is not the owner, don't start.
+    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    await Sprint.update({
+        status : "done"
+    }, {
+        where : {
+            project : projectID,
+            status : "active"
+        }
+    });
+    let plannedSprint = Sprint.findOne({
+        where : {
+            project : projectID,
+            status : 'planned'
+        }
+    });
+
+    if(plannedSprint) {
+        await Sprint.update({
+            status : "active"
+        }, {
+            where : {
+                project : projectID,
+                status : "planning"
+            }
+        });
+    
+        res.status(200).send({data : 'started'});
+    } else {
+        res.status(400).send({data : 'No planned sprint'});
+    }
+    
+});
+
 router.post('/plan', async (req, res) => {
     let issues = [];
     let blockedBy = [], blocking = [];
@@ -76,18 +120,53 @@ router.post('/plan', async (req, res) => {
 
     let { projectID, workTime } = _.pick(req.body, ['projectID', 'workTime']); 
 
-    let project = await Project.findByPk(projectID);
+    let project = await Project.findOne({
+        where: {
+            'id' : projectID
+        },
+        include: {
+            model: Epic,
+            include: {
+                model: Issue,
+                include: [
+                    { 
+                        model: Issue,
+                        as: 'blocker' 
+                    },
+                    { 
+                        model: Issue,
+                        as: 'blocked' 
+                    }
+                ] 
+            }
+        }
+    });
+    
     if (!project) return res.status(400).send('Project does not exist.');
 
-    epics = await project.getEpics();
-
-    // get issues
-    for(i = 0; i < epics.length; i++) {
-        epicIssues = await epics[i].getIssues();
-        issues.push(...epicIssues)
+    let previousPlanned = await Sprint.findOne({
+        where : {
+            project : projectID,
+            status : 'planned'
+        }
+    });
+    
+    // Delete previous planned sprint
+    if(previousPlanned) {
+        await previousPlanned.destroy();
     }
 
+    await project.reload();
+
+    // Load issues
+    project['Epics'].forEach(epic => {
+        epic['Issues'].forEach(issue => {
+            issues.push(issue);
+        });
+    });
+
     issues.forEach(issue => {
+        console.log(issue)
         blockedBy.push(issue.getBlocked());
         blocking.push(issue.getBlocker());
     });
@@ -109,6 +188,7 @@ router.post('/plan', async (req, res) => {
             issuesGraph[blocks.id].blocking.push(issue.id);
         })
     });
+
     let issuesClusterDetails = getGraphClustersValue(issuesGraph);
     let newAssignees = [];
     while(issuesClusterDetails.length > 0) {
@@ -124,30 +204,35 @@ router.post('/plan', async (req, res) => {
             })
         })
     }
-    console.log(newAssignees)
-    res.status(400).send('something went wrong');
+
+    let newSprint = await createPlannedSprint(projectID);
+    
+    for (let i = 0; i < newAssignees; i++) {
+        await updateIssue(newAssignees[i].user, newAssignees[i].issue, newSprint.id);   
+    }
+
+    res.status(200).send('something went wrong');
 });
 
-let createPlannedSprint = async (project) => {
+let createPlannedSprint = async (projectID) => {
     sprint = await Sprint.create({
-        project,
+        project: projectID,
         startTime : undefined,
-        status: "planned"
+        status : "planned",
+        startTime : null,
+        endTime : null
     });
     return sprint;
 }
 
-let updateIssue = async (assignee) => {
-    let issue = await Issue.findByPk(req.params.id);
-    if (!issue) return res.status(400).send('Issue does not exist.');
+let updateIssue = async (assignee, issueID, sprintID) => {
 
     await Issue.update(
         { 
-            asignee: assignee,
+            asignee : assignee,
+            sprint  : sprintID
         },
-        { where: { id: req.params.id }});
-
-    issue = await Issue.findByPk(req.params.id);
+        { where: { id: issueID }});
     return true;
 }
 
