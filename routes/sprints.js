@@ -87,14 +87,15 @@ router.get('/:id/users', auth, async (req, res) => {
     res.status(200).send(_.map(users, _.partialRight(_.pick, ['id', 'name', 'email'])));
 });
 
-router.get('/:id/users/storypoints', async (req, res) => {
-    let sprint = await Sprint.findByPk(req.params.id);
-    if (!sprint) return res.status(400).send('Sprint does not exist.');
+router.get('/storypoints', async (req, res) => {
+    let { projectID } = _.pick(req.body, ['project']);
 
-    project = await Project.findByPk(sprint.project);
-    // If this is not the owner, don't delete.
-    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.');
+    project = await Project.findByPk(projectID);
 
+    // If this is not the owner, don't start.
+    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+
+    // Get all Users
     const sprintUsers = await User_Sprint.findAll(
         {
             attributes: [ 'UserId' ],
@@ -104,70 +105,10 @@ router.get('/:id/users/storypoints', async (req, res) => {
         }
     );
     
-    sprintUsers.forEach(async (user) => {
-        let userIssues = await User_Sprint.findAll(
-            {
-                where: {
-                    SprintId: req.params.id,
-                    UserId: user.id
-                }
-            }
-        );
-
-        let storyPoints = 0;
-        userIssues.forEach(async (issue) => {
-            storyPoints += issue.storyPoints;
-        });
-
-        user.story_points = storyPoints;
-    });
+    res.status(200).send(sprintUsers);
 });
 
-// activate sprint
-router.put('/:id/activate', async (req, res) => {
-    let sprint = await Sprint.findByPk(req.params.id);
-    if (!sprint) return res.status(400).send('Sprint does not exist.');
-
-    project = await Project.findByPk(sprint.project);
-    // If this is not the owner, don't delete.
-    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
-
-    // Get the current active sprint
-    currentSprint = Sprint.findOne({ 
-        where: {
-            status: 'active'
-        }
-    });
-
-    // Destroy this sprint
-    currentSprint.destroy();
-
-    // Update the status of the new sprint
-    sprint.update({ status: 'active' });
-
-    // Get all issues of this sprint
-    sprintIssues = await Issue.findAll(
-        {
-            where: {
-                sprint: req.params.id
-            }
-        }
-    );
-
-    // Add statistics about this sprint story points per user.
-    sprintIssues.forEach((issue) => {
-        User_Sprint.create({
-            UserId: issue.asignee,
-            SprintId: sprint.id,
-            story_points: issue.storyPoints
-        });
-    });
-
-    res.status(200).send(sprint);
-});
-
-// Delete a sprint
-// Only the owner and admin
+// start a sprint
 router.post('/start', auth, async (req, res) => {
     let { projectID } = _.pick(req.body, ['project']);
 
@@ -201,11 +142,41 @@ router.post('/start', auth, async (req, res) => {
             }
         });
     
+        // Get all issues of this sprint
+        const sprintIssues = await Issue.findAll(
+            {
+                where: {
+                    sprint: plannedSprint.id
+                }
+            }
+        );
+
+        let usersStoryPoints = {};
+
+        // Add statistics about this sprint story points per user.
+        sprintIssues.forEach((issue) => {
+            if(!usersStoryPoints[issue.asignee]) {
+                usersStoryPoints[issue.asignee] = 0;
+            }
+            usersStoryPoints[issue.asignee] += issue.storyPoints;
+        });
+
+        let allUsers = Object.keys(usersStoryPoints);
+
+        var finished = allUsers.forEach(async (user) => {
+            await User_Sprint.create({
+                UserId: user,
+                SprintId: sprint.id,
+                story_points: usersStoryPoints[user]
+            });
+        })
+
+        await Promise.all(finished);
+
         res.status(200).send({data : 'started'});
     } else {
         res.status(400).send({data : 'No planned sprint'});
     }
-    
 });
 
 router.post('/plan', async (req, res) => {

@@ -174,6 +174,28 @@ router.get('/:id/issues', async (req, res) => {
             }
         });
     } 
+    else if (sprintFilter.status) {
+        projectData = await Project.findOne({
+            where:{
+                'id': req.params.id,
+            },
+            include: {
+                model: Epic,
+                include: {
+                    model: Issue,
+                    include: [{
+                        model: Sprint,
+                        attributes: ['status'],
+                        where: sprintFilter
+                    },
+                    {
+                        model: User,
+                        attributes: ['id', 'name']
+                    }]
+                }
+            }
+        });
+    }
     else {  
         projectData = await Project.findOne({
             where:{
@@ -186,7 +208,7 @@ router.get('/:id/issues', async (req, res) => {
                     include: [{
                         model: Sprint,
                         attributes: ['status'],
-                        where : sprintFilter
+                        // where: sprintFilter
                     },
                     {
                         model: User,

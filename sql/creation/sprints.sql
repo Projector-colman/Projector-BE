@@ -16,8 +16,10 @@ CREATE TABLE public.sprints
     "createdAt" date,
     "updatedAt" date,
     status character varying COLLATE pg_catalog."default",
+    "endTime" date,
+    "storyPoints" integer,
     CONSTRAINT sprints_pkey PRIMARY KEY (id),
-    CONSTRAINT "project id" FOREIGN KEY (id)
+    CONSTRAINT "project id" FOREIGN KEY (project)
         REFERENCES public.projects (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE
