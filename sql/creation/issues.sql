@@ -1,4 +1,4 @@
--- Table: public.issues
+--- Table: public.issues
 
 -- DROP TABLE public.issues;
 
