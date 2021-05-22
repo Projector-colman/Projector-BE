@@ -40,7 +40,7 @@ User_Sprint.init({
   }, {
     sequelize: db,
     modelName: 'User_Sprint',
-    tableName: 'UserSprint'
+    tableName: 'UserSprints'
   }
 );
 

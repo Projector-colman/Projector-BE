@@ -111,6 +111,7 @@ router.get('/storypoints', async (req, res) => {
 // start a sprint
 router.post('/start', auth, async (req, res) => {
     let { projectID } = _.pick(req.body, ['project']);
+    projectID = req.body.project;
 
     project = await Project.findByPk(projectID);
 
@@ -125,7 +126,8 @@ router.post('/start', auth, async (req, res) => {
             status : "active"
         }
     });
-    let plannedSprint = Sprint.findOne({
+
+    let plannedSprint = await Sprint.findOne({
         where : {
             project : projectID,
             status : 'planned'
@@ -137,8 +139,7 @@ router.post('/start', auth, async (req, res) => {
             status : "active"
         }, {
             where : {
-                project : projectID,
-                status : "planning"
+                id : plannedSprint.id
             }
         });
     
@@ -161,17 +162,16 @@ router.post('/start', auth, async (req, res) => {
             usersStoryPoints[issue.asignee] += issue.storyPoints;
         });
 
+
         let allUsers = Object.keys(usersStoryPoints);
 
-        var finished = allUsers.forEach(async (user) => {
+        allUsers.forEach(async (user) => {
             await User_Sprint.create({
-                UserId: user,
-                SprintId: sprint.id,
+                UserId: +user,
+                SprintId: plannedSprint.id,
                 story_points: usersStoryPoints[user]
             });
         })
-
-        await Promise.all(finished);
 
         res.status(200).send({data : 'started'});
     } else {
@@ -273,7 +273,7 @@ router.post('/plan', async (req, res) => {
 
     let newSprint = await createPlannedSprint(projectID);
     
-    for (let i = 0; i < newAssignees; i++) {
+    for (let i = 0; i < newAssignees.length; i++) {
         await updateIssue(newAssignees[i].user, newAssignees[i].issue, newSprint.id);   
     }
 
@@ -283,10 +283,8 @@ router.post('/plan', async (req, res) => {
 let createPlannedSprint = async (projectID) => {
     sprint = await Sprint.create({
         project: projectID,
-        startTime : undefined,
-        status : "planned",
         startTime : null,
-        endTime : null
+        status : "planned",
     });
     return sprint;
 }
