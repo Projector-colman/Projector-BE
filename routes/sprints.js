@@ -10,7 +10,7 @@ const { Epic } = require('../models/epic');
 const router = express.Router();
 const { getGraphClustersValue,
         findHighestValueCluster } = require('../utils/graphs');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const { User_Sprint } = require('../models/sprint_user');
 
 // Get all comments
@@ -77,35 +77,45 @@ router.get('/:id/users', auth, async (req, res) => {
     let sprint = await Sprint.findByPk(req.params.id);
     if (!sprint) return res.status(400).send('Sprint does not exist.');
 
-    // If this is not the owner, don't delete.
-    // if ((sprint.project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
-
-    console.log(sprint);
-
     users = await sprint.getUsers();
 
     res.status(200).send(_.map(users, _.partialRight(_.pick, ['id', 'name', 'email'])));
 });
 
-router.get('/storypoints', async (req, res) => {
+router.get('/storypoints', [auth], async (req, res) => {
     let { projectID } = _.pick(req.body, ['project']);
+    projectID = req.body.project;
 
     project = await Project.findByPk(projectID);
+    if (!project) return res.status(400).send('Project does not exist.');
 
     // If this is not the owner, don't start.
     if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
+    const sprint = await Sprint.findOne({
+        where : {
+            project : projectID,
+            status : "active"
+        }
+    });
+
+    console.log(sprint);
+
     // Get all Users
     const sprintUsers = await User_Sprint.findAll(
         {
-            attributes: [ 'UserId' ],
+            attributes: ['UserId', 'story_points'],
             where: {
-                SprintId: req.params.id
+                SprintId: sprint.id
             }
         }
     );
     
-    res.status(200).send(sprintUsers);
+    var finalStats = {};
+    finalStats['sprint'] = sprint.id;
+    finalStats['users'] = sprintUsers;
+
+    res.status(200).send(finalStats);
 });
 
 // start a sprint
@@ -118,14 +128,34 @@ router.post('/start', auth, async (req, res) => {
     // If this is not the owner, don't start.
     if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
-    await Sprint.update({
-        status : "done"
-    }, {
+    const sprint = await Sprint.findOne({
         where : {
             project : projectID,
             status : "active"
         }
     });
+
+    await Issue.update(
+        {
+            sprint: null
+        },
+        {
+            where: {
+                sprint: sprint.id
+            }
+        }
+    );
+
+    await sprint.update({ status : "done" })
+
+    // await Sprint.update({
+    //     status : "done"
+    // }, {
+    //     where : {
+    //         project : projectID,
+    //         status : "active"
+    //     }
+    // });
 
     let plannedSprint = await Sprint.findOne({
         where : {
@@ -232,7 +262,6 @@ router.post('/plan', async (req, res) => {
     });
 
     issues.forEach(issue => {
-        console.log(issue)
         blockedBy.push(issue.getBlocked());
         blocking.push(issue.getBlocker());
     });
