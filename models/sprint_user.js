@@ -8,6 +8,7 @@ class User_Sprint extends Model {};
 User_Sprint.init({
     UserId: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         allowNull: false, // won't allow null
         validate: {
         isInt: true, // checks for valid integers
@@ -20,6 +21,7 @@ User_Sprint.init({
     },
     SprintId: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         allowNull: true, // will allow null
         validate: {
             isInt: true, // checks for valid integers
