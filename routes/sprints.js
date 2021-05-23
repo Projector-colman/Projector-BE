@@ -134,20 +134,23 @@ router.post('/start', auth, async (req, res) => {
             status : "active"
         }
     });
-
-    await Issue.update(
-        {
-            sprint: null
-        },
-        {
-            where: {
-                sprint: sprint.id
+    if (sprint) {
+        await Issue.update(
+            {
+                sprint: null
+            },
+            {
+                where: {
+                    sprint: sprint.id,
+                    status: {
+                        [Op.not] : 'done'
+                    }
+                }
             }
-        }
-    );
+        );
 
-    await sprint.update({ status : "done" })
-
+        await sprint.update({ status : "done" })
+    }
     // await Sprint.update({
     //     status : "done"
     // }, {
