@@ -291,7 +291,7 @@ router.post('/plan', async (req, res) => {
         mostValueableCluster.details.forEach(issue => {
             let isAssigned = false;
             workTime.forEach(user => {
-                if(user.time > issue.points && !isAssigned) {
+                if(user.time >= issue.points && !isAssigned) {
                     user.time -= issue.points
                     newAssignees.push({issue : issue.id, user : user.id})
                     isAssigned = true;
