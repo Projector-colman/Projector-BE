@@ -141,7 +141,7 @@ router.get('/graph1', auth, async (req, res) => {
 
     var answer = {};
 
-    answer.userIssues = await Issue.findAll({
+    answer.issues = await Issue.findAll({
         where: {
             sprint: sprint.id,
             asignee: user.id,
@@ -152,7 +152,7 @@ router.get('/graph1', auth, async (req, res) => {
         }
     });
 
-    answer.userStoryPoints = await User_Sprint.findAll(
+    answer.storyPoints = await User_Sprint.findAll(
         {
             attributes: ['story_points'],
             where: {
@@ -161,6 +161,70 @@ router.get('/graph1', auth, async (req, res) => {
             }
         }
     );
+
+    answer.startTime = sprint.startTime;
+    answer.endTime = sprint.endTime;
+
+
+    res.status(200).send(answer);
+});
+
+router.get('/graph2', auth, async (req, res) => {
+    sprintId = req.body.sprint;
+    userId = req.body.user
+
+    if ((!userId) || (!sprintId)) return res.status(400).send('Missing data for the request.');
+
+    const sprint = await Sprint.findByPk(sprintId);
+
+    if (!sprint) return res.status(400).send('Sprint not found.');
+
+    var answer = {};
+
+    // If all team
+    if (userId == -1) {
+        answer.issues = await Issue.findAll({
+            where: {
+                sprint: sprint.id,
+                status: 'done',
+                updatedAt: {
+                    [Op.not] : null
+                }
+            }
+        });
+    
+        answer.storyPoints = await User_Sprint.sum('story_points',
+            {
+                where: {
+                    SprintId: sprint.id,
+                }
+            }
+        );
+    } else {
+        const user = await User.findByPk(userId);
+        if (!user) return res.status(400).send('User not found.');
+
+        answer.issues = await Issue.findAll({
+            where: {
+                sprint: sprint.id,
+                asignee: user.id,
+                status: 'done',
+                updatedAt: {
+                    [Op.not] : null
+                }
+            }
+        });
+    
+        answer.storyPoints = await User_Sprint.findAll(
+            {
+                attributes: ['story_points'],
+                where: {
+                    SprintId: sprint.id,
+                    UserId: user.id
+                }
+            }
+        );
+    }
 
     answer.startTime = sprint.startTime;
     answer.endTime = sprint.endTime;
