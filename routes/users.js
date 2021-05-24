@@ -126,8 +126,11 @@ router.put('/:id', auth, async (req, res) => {
     // }
 
     // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    password = await bcrypt.hash(password, salt);
+
+    if (password) {
+        const salt = await bcrypt.genSalt(10);
+        password = await bcrypt.hash(password, salt);
+    }
 
     await user.update(
         { 
