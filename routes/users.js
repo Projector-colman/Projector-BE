@@ -111,9 +111,6 @@ router.post('/', async (req, res) => {
 // Update a user:
 // Only the user itself and the admin.
 router.put('/:id', auth, async (req, res) => {
-    const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
@@ -121,16 +118,18 @@ router.put('/:id', auth, async (req, res) => {
     if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     let { name, email, password, image } = _.pick(req.body, ['name', 'email', 'password', 'image']);
-    
+
     // If email already exists anywhere in the system.
-    let userWithEmail = await User.findOne({ where: { email: email }});
-    if (userWithEmail) return res.status(400).send('Email already exists in another user.');
+    // if (email) {
+    //     let userWithEmail = await User.findOne({ where: { email: email }});
+    //     if (userWithEmail) return res.status(400).send('Email already exists in another user.');
+    // }
 
     // Hash the password
     const salt = await bcrypt.genSalt(10);
     password = await bcrypt.hash(password, salt);
 
-    await User.update(
+    await user.update(
         { 
             name: name,
             email: email,
@@ -138,8 +137,6 @@ router.put('/:id', auth, async (req, res) => {
             image: image
         },
         { where: { id: req.params.id }});
-
-    user = await User.findByPk(req.params.id);
 
     res.send(_.pick(user, ['id', 'name', 'email', 'image']));
 });

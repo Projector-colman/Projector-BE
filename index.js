@@ -6,10 +6,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: '5000mb' }));
 
 // All incoming request can parse json data
-app.use(bodyParser.json());
+app.use(express.json({limit: '5000mb'}));
+
+app.use(express({limit: '5000mb'}));
 
 const server = require("http").createServer(app);
 const config = require("config");
