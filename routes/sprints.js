@@ -12,6 +12,7 @@ const { getGraphClustersValue,
         findHighestValueCluster } = require('../utils/graphs');
 const { Op, where } = require('sequelize');
 const { User_Sprint } = require('../models/sprint_user');
+const { User } = require('../models/user');
 
 // Get all comments
 // Only admin can get it.
@@ -118,6 +119,56 @@ router.get('/storypoints', [auth], async (req, res) => {
     res.status(200).send(finalStats);
 });
 
+router.get('/graph1', auth, async (req, res) => {
+    // let { projectId, userId } = _.pick(req.body, ['project', 'user']);
+    projectId = req.body.project;
+    userId = req.body.user
+
+    if ((!userId) || (!projectId)) return res.status(400).send('Missing data for the request.');
+
+    const project = await Project.findByPk(projectId);
+    const user = await User.findByPk(userId);
+
+    if (!project) return res.status(400).send('Project not found.');
+    if (!user) return res.status(400).send('User not found.');
+
+    const sprint = await Sprint.findOne({
+        where : {
+            project : projectId,
+            status : "active"
+        }
+    });
+
+    var answer = {};
+
+    answer.userIssues = await Issue.findAll({
+        where: {
+            sprint: sprint.id,
+            asignee: user.id,
+            status: 'done',
+            updatedAt: {
+                [Op.not] : null
+            }
+        }
+    });
+
+    answer.userStoryPoints = await User_Sprint.findAll(
+        {
+            attributes: ['story_points'],
+            where: {
+                SprintId: sprint.id,
+                UserId: user.id
+            }
+        }
+    );
+
+    answer.startTime = sprint.startTime;
+    answer.endTime = sprint.endTime;
+
+
+    res.status(200).send(answer);
+});
+
 // start a sprint
 router.post('/start', auth, async (req, res) => {
     let { projectID } = _.pick(req.body, ['project']);
@@ -134,6 +185,7 @@ router.post('/start', auth, async (req, res) => {
             status : "active"
         }
     });
+
     if (sprint) {
         await Issue.update(
             {
