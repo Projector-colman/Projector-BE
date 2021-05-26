@@ -15,7 +15,7 @@ router.get('/', [auth, admin], async (req, res) => {
     
     const filter = _.pick(req.query, ['id', 'epic', 'asignee', 'priority', 'sprint', 'status', 'name']);
     const issues = await Issue.findAll({ where: filter,
-                                         order: [[ 'name', 'ASC' ]] });
+                                         order: [[ 'name', 'ASC' ]]});
     issues.forEach(issue => users.push(issue.getUser()));
 
     let data = await Promise.all(users);

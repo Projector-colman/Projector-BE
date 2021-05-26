@@ -213,7 +213,18 @@ router.get('/:id/issues', async (req, res) => {
                     {
                         model: User,
                         attributes: ['id', 'name']
-                    }]
+                    },
+                    { 
+                        model: Issue,
+                        as: 'blocker',
+                        attributes: ['name']
+                    },
+                    { 
+                        model: Issue,
+                        as: 'blocked',
+                        attributes: ['name']
+                    }
+                    ]
                 }
             }
         });
