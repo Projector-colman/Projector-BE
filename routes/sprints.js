@@ -120,9 +120,9 @@ router.get('/storypoints', [auth], async (req, res) => {
 });
 
 router.get('/graph1', auth, async (req, res) => {
-    // let { projectId, userId } = _.pick(req.body, ['project', 'user']);
-    projectId = req.body.project;
-    userId = req.body.user
+     //let { projectId, userId } = _.pick(req.body, ['project', 'user']);
+    projectId = req.query.project;
+    userId = req.query.user
 
     if ((!userId) || (!projectId)) return res.status(400).send('Missing data for the request.');
 
@@ -144,11 +144,7 @@ router.get('/graph1', auth, async (req, res) => {
     answer.issues = await Issue.findAll({
         where: {
             sprint: sprint.id,
-            asignee: user.id,
-            status: 'done',
-            updatedAt: {
-                [Op.not] : null
-            }
+            asignee: user.id
         }
     });
 
@@ -170,8 +166,8 @@ router.get('/graph1', auth, async (req, res) => {
 });
 
 router.get('/graph2', auth, async (req, res) => {
-    sprintId = req.body.sprint;
-    userId = req.body.user
+    sprintId = req.query.sprint;
+    userId = req.query.user
 
     if ((!userId) || (!sprintId)) return res.status(400).send('Missing data for the request.');
 
@@ -186,17 +182,13 @@ router.get('/graph2', auth, async (req, res) => {
         answer.issues = await Issue.findAll({
             where: {
                 sprint: sprint.id,
-                status: 'done',
-                updatedAt: {
-                    [Op.not] : null
-                }
             }
         });
     
         answer.storyPoints = await User_Sprint.sum('story_points',
             {
                 where: {
-                    SprintId: sprint.id,
+                    SprintId: sprint.id
                 }
             }
         );
@@ -207,11 +199,7 @@ router.get('/graph2', auth, async (req, res) => {
         answer.issues = await Issue.findAll({
             where: {
                 sprint: sprint.id,
-                asignee: user.id,
-                status: 'done',
-                updatedAt: {
-                    [Op.not] : null
-                }
+                asignee: user.id
             }
         });
     
