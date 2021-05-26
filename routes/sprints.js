@@ -188,7 +188,7 @@ router.get('/graph2', auth, async (req, res) => {
         answer.storyPoints = await User_Sprint.sum('story_points',
             {
                 where: {
-                    SprintId: sprint.id,
+                    SprintId: sprint.id
                 }
             }
         );
@@ -199,7 +199,7 @@ router.get('/graph2', auth, async (req, res) => {
         answer.issues = await Issue.findAll({
             where: {
                 sprint: sprint.id,
-                asignee: user.id,
+                asignee: user.id
             }
         });
     
