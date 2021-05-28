@@ -190,7 +190,7 @@ router.get('/:id/issues', async (req, res) => {
                     },
                     {
                         model: User,
-                        attributes: ['id', 'name']
+                        attributes: ['id', 'name', 'image']
                     }]
                 }
             }
@@ -212,7 +212,7 @@ router.get('/:id/issues', async (req, res) => {
                     },
                     {
                         model: User,
-                        attributes: ['id', 'name']
+                        attributes: ['id', 'name', 'image']
                     },
                     { 
                         model: Issue,

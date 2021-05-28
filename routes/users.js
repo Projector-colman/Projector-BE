@@ -27,7 +27,7 @@ router.get('/:id/image', [ auth ], async (req, res) => {
     let user = await User.findByPk(req.params.id);
     if (!user) return res.status(400).send('User does not exist.');
 
-    res.set('Content-Type', 'image/png').send(user.image);
+    res.set('Content-Type', 'image/png').send({image :user.image});
 });
 
 router.put('/:id/image', [ auth, upload.single('upload') ], async (req, res) => {
