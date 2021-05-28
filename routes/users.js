@@ -187,14 +187,14 @@ router.get('/:id/issues/assignee', auth, async (req, res) => {
     if (!user) return res.status(400).send('User does not exist.');
 
     // If this is not the owner or an admin, don't delete.
-    if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    //if ((req.params.id != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     const issues = await Issue.findAll({ 
         where: { asignee: user.id },
         order: [[ 'name', 'ASC' ]],
         include: {
             model: User,
-            attributes: ['id', 'name']
+            attributes: ['id', 'name', 'image']
         }
     });
 
