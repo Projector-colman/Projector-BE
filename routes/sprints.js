@@ -255,14 +255,6 @@ router.post('/start', auth, async (req, res) => {
 
         await sprint.update({ status : "done" })
     }
-    // await Sprint.update({
-    //     status : "done"
-    // }, {
-    //     where : {
-    //         project : projectID,
-    //         status : "active"
-    //     }
-    // });
 
     let plannedSprint = await Sprint.findOne({
         where : {
@@ -380,14 +372,16 @@ router.post('/plan', async (req, res) => {
     issues.forEach(issue => {
         issuesGraph[issue.id] = { cost: issue.storyPoints, status: issue.status, priority: issue.priority, blocking : [], blockedBy : []};
     });
-    
+
     // build vertices
     issues.forEach((issue, i) => {
         blockedData[i].forEach(blocked => {
-            issuesGraph[blocked.id].blockedBy.push(issue.id);
+            if(issuesGraph[blocked.id])
+                issuesGraph[blocked.id].blockedBy.push(issue.id);
         });
         blockingData[i].forEach(blocks => {
-            issuesGraph[blocks.id].blocking.push(issue.id);
+            if(issuesGraph[blocks.id])
+                issuesGraph[blocks.id].blocking.push(issue.id);
         })
     });
 
@@ -396,15 +390,17 @@ router.post('/plan', async (req, res) => {
     while(issuesClusterDetails.length > 0) {
         let mostValueableCluster = findHighestValueCluster(issuesClusterDetails);
         mostValueableCluster.details.forEach(issue => {
-            let isAssigned = false;
-            workTime.forEach(user => {
-                if(user.time >= issue.points && !isAssigned) {
-                    user.time -= issue.points
-                    newAssignees.push({issue : issue.id, user : user.id})
-                    isAssigned = true;
-                }
-            })
-        })
+            if(issue.status != 'done') {
+                let isAssigned = false;
+                workTime.forEach(user => {
+                    if(user.time >= issue.points && !isAssigned) {
+                        user.time -= issue.points
+                        newAssignees.push({issue : issue.id, user : user.id})
+                        isAssigned = true;
+                    }
+                });
+            }
+        });
     }
 
     let newSprint = await createPlannedSprint(projectID);
@@ -413,7 +409,7 @@ router.post('/plan', async (req, res) => {
         await updateIssue(newAssignees[i].user, newAssignees[i].issue, newSprint.id);   
     }
 
-    res.status(200).send('something went wrong');
+    res.status(200).send({data: 'planned'});
 });
 
 let createPlannedSprint = async (projectID) => {

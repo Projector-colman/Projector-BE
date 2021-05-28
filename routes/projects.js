@@ -130,7 +130,7 @@ router.delete('/:id/users/:userId', auth, async (req, res) => {
     if (!project) return res.status(400).send('Project does not exist.');
 
     // If this is not the owner, don't delete.
-    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    //if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
     if(req.params.userId == project.owner) return res.status(401).send('Cant delete project owner'); 
     
     user = await project.getUsers({
@@ -164,7 +164,11 @@ router.get('/:id/issues', async (req, res) => {
                 model: Epic,
                 include: {
                     model: Issue,
-                    where : {sprint : null},
+                    where : {sprint : null,
+                             status: {
+                                [Op.not] : 'done'
+                                }
+                            },
                     include: [
                     {
                         model: User,
@@ -273,7 +277,8 @@ router.get('/:id/done', auth, async (req, res) => {
         include: {
             model: Issue,
             where: {
-                status: 'done'
+                status: 'done',
+                sprint : null
             },
             include: {
                 model: User,

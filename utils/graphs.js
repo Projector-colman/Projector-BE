@@ -101,7 +101,7 @@ getGraphClustersValue = (graph) => {
         let fullGraph = issueIdtoIssueObject(graph, graphIndexes);
         sortedSubGraphs.push(topologicalSort(fullGraph));
     });
-
+    
     // Building the graph from the sorted issues indexes
     sortedSubGraphs.forEach(graphIndexes => {
         sortedGraph.push(issueIdtoIssueObject(graph, graphIndexes));
@@ -113,7 +113,7 @@ getGraphClustersValue = (graph) => {
         let issuesID = Object.keys(issuesCluster);
         let issuesDetails = [];
         issuesID.forEach(issueId => {
-            issuesDetails.push({id: issueId, points: issuesCluster[issueId].cost})
+            issuesDetails.push({id: issueId, points: issuesCluster[issueId].cost, status: issuesCluster[issueId].status})
             // Add the issue const
             clusterValue += issuesCluster[issueId].priority;
             clusterCost += issuesCluster[issueId].cost;
