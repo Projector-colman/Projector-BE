@@ -194,6 +194,7 @@ router.get('/:id/issues/assignee', auth, async (req, res) => {
         order: [[ 'name', 'ASC' ]],
         include: {
             model: User,
+            as: 'asignee',
             attributes: ['id', 'name', 'image']
         }
     });

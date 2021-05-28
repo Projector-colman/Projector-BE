@@ -108,7 +108,7 @@ Issue.belongsTo(User, { foreignKey: { name: 'reporter' } });
 
 // user assigned to many issues
 User.hasMany(Issue, { foreignKey: { name: 'asignee' } });
-Issue.belongsTo(User, { foreignKey: { name: 'asignee' } });
+Issue.belongsTo(User, { as: 'assignee', foreignKey: { name: 'asignee' } });
 
 // epics have many issues
 Epic.hasMany(Issue, { foreignKey: { name: 'epic' } });

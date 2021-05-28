@@ -168,6 +168,7 @@ router.get('/:id/issues', async (req, res) => {
                     include: [
                     {
                         model: User,
+                        as: 'assignee',
                         attributes: ['id', 'name']
                     }]
                 }
@@ -190,6 +191,7 @@ router.get('/:id/issues', async (req, res) => {
                     },
                     {
                         model: User,
+                        as: 'assignee',
                         attributes: ['id', 'name', 'image']
                     }]
                 }
@@ -212,6 +214,7 @@ router.get('/:id/issues', async (req, res) => {
                     },
                     {
                         model: User,
+                        as: 'assignee',
                         attributes: ['id', 'name', 'image']
                     },
                     { 
@@ -257,6 +260,30 @@ router.get('/:id/sprints', auth, async (req, res) => {
     sprints = await project.getSprints();
 
     res.status(200).send(_.map(sprints, _.partialRight(_.pick, ['id', 'startTime', 'endTime', 'storyPoints', 'status'])));
+});
+
+router.get('/:id/done', auth, async (req, res) => {
+    let project = await Project.findByPk(req.params.id);
+    if (!project) return res.status(400).send('Project does not exist.');
+
+    const issues = await Epic.findAll({
+        where : {
+            project : project.id
+        },
+        include: {
+            model: Issue,
+            where: {
+                status: 'done'
+            },
+            include: {
+                model: User,
+                as: 'assignee',
+                attributes: ['id', 'name', 'image']
+            }
+        }
+    });
+
+    res.status(200).send(issues)
 });
 
 module.exports = router;
