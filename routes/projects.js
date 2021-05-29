@@ -278,7 +278,7 @@ router.get('/:id/sprints', auth, async (req, res) => {
     if (!project) return res.status(400).send('Project does not exist.');
 
     // If this is not the owner, don't delete.
-    if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    //if ((project.owner != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     sprints = await project.getSprints();
 
