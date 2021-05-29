@@ -326,7 +326,7 @@ router.post('/plan', async (req, res) => {
                 include: [
                     { 
                         model: Issue,
-                        as: 'blocker' 
+                        as: 'blockers' 
                     },
                     { 
                         model: Issue,
@@ -362,7 +362,7 @@ router.post('/plan', async (req, res) => {
 
     issues.forEach(issue => {
         blockedBy.push(issue.getBlocked());
-        blocking.push(issue.getBlocker());
+        blocking.push(issue.getBlockers());
     });
 
     let blockedData = await Promise.all(blockedBy);

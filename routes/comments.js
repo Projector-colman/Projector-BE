@@ -7,8 +7,8 @@ const router = express.Router();
 
 // Get all comments
 // Only admin can get it.
-router.get('/', [auth, admin], async (req, res) => {
-    const filter = _.pick(req.query, ['id', 'writer', 'issue', 'createdAt', 'updatedAt']);
+router.get('/', auth, async (req, res) => {
+    const filter = _.pick(req.query, ['id', 'writer', 'issue']);
     const comments = await Comment.findAll({ 
         where: filter,
         order: [[ 'createdAt', 'ASC' ]] 

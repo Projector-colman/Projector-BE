@@ -169,11 +169,20 @@ router.get('/:id/issues', async (req, res) => {
                                 [Op.not] : 'done'
                                 }
                             },
-                    include: [
-                    {
+                    include: [{
                         model: User,
                         as: 'assignee',
                         attributes: ['id', 'name']
+                    },
+                    { 
+                        model: Issue,
+                        as: 'blockers',
+                        attributes: ['name']
+                    },
+                    { 
+                        model: Issue,
+                        as: 'blocked',
+                        attributes: ['name']
                     }]
                 }
             }
@@ -197,6 +206,16 @@ router.get('/:id/issues', async (req, res) => {
                         model: User,
                         as: 'assignee',
                         attributes: ['id', 'name', 'image']
+                    },
+                    { 
+                        model: Issue,
+                        as: 'blockers',
+                        attributes: ['name']
+                    },
+                    { 
+                        model: Issue,
+                        as: 'blocked',
+                        attributes: ['name']
                     }]
                 }
             }
@@ -223,7 +242,7 @@ router.get('/:id/issues', async (req, res) => {
                     },
                     { 
                         model: Issue,
-                        as: 'blocker',
+                        as: 'blockers',
                         attributes: ['name']
                     },
                     { 

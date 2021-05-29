@@ -37,24 +37,33 @@ router.post('/', auth, async (req, res) => {
     if (issue) return res.status(400).send('An issue in this epic with this name already exists');
 
     const reporter = req.user.id;
-    
-    issue = await Issue.create({
-        name,
-        epic,
-        description,
-        reporter,
-        asignee,
-        storyPoints,
-        priority,
-        sprint,
-        status
-    });
 
      if (blockerId) { 
          blockerIssue = await Issue.findByPk(blockerId);
          if (!blockerIssue) return res.status(400).send('Blocking issue does not exist.');
-
-         issue.createBlocker({ blocker: blockerId, blocked: issue.id });
+         issue = await blockerIssue.createBlocked({
+            name,
+            epic,
+            description,
+            reporter,
+            asignee,
+            storyPoints,
+            priority,
+            sprint,
+            status
+         });
+     } else {
+        issue = await Issue.create({
+            name,
+            epic,
+            description,
+            reporter,
+            asignee,
+            storyPoints,
+            priority,
+            sprint,
+            status
+        });
      }
 
     res.status(200).send(_.pick(issue, ['id', 'name', 'description', 'epic', 'reporter', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']));
@@ -67,7 +76,7 @@ router.put('/:id', auth, async (req, res) => {
     if (!issue) return res.status(400).send('Issue does not exist.');
 
     // If this is not the owner or admin, don't update.
-    if ((issue.reporter != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
+    //if ((issue.reporter != req.user.id) && (!req.user.isAdmin)) return res.status(401).send('Access denied. Not the Owner of this resource.'); 
 
     // Should we change reporter also ?
     let { name, description, epic, asignee, storyPoints, priority, sprint, status } = _.pick(req.body, ['name', 'description', 'epic', 'asignee', 'storyPoints', 'priority', 'sprint', 'status']);

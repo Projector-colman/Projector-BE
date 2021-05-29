@@ -115,7 +115,7 @@ Epic.hasMany(Issue, { foreignKey: { name: 'epic' } });
 Issue.belongsTo(Epic, { foreignKey: { name: 'epic' } });
 
 // issues blocks and blocked by many issues
-Issue.belongsToMany(Issue, { as: 'blocker', through: 'linked_issues', foreignKey: {name: 'blocked'} });
+Issue.belongsToMany(Issue, { as: 'blockers', through: 'linked_issues', foreignKey: {name: 'blocked'} });
 Issue.belongsToMany(Issue, { as: 'blocked', through: 'linked_issues' , foreignKey: {name: 'blocker'}});
 
 // Sprints have many issues
