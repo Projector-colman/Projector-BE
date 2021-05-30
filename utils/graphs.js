@@ -57,14 +57,16 @@ findSubGraphs = (graph) => {
             let w = Q.shift();
             let neighbors = graph[w].blocking.slice(); // slice is to copy by val instead of by ref
             neighbors = insertUnique(neighbors, graph[w].blockedBy)
+            
             neighbors.forEach(x => {
                 if(subGraphs[subGraphIndex].indexOf(+x) < 0) {
-                    nodes.splice(nodes.indexOf(x), 1);
+                    nodes.splice(nodes.indexOf(x.toString()), 1);
                     subGraphs[subGraphIndex].push(+x);
                     Q.push(x);
                 }
             });
         }
+        
         subGraphIndex++;
     }
     return subGraphs;
@@ -94,14 +96,14 @@ getGraphClustersValue = (graph) => {
     let sortedSubGraphs = [];
     let sortedGraph = [];
     let issuesClusterDetails = [];
-
+    
     // Finding all clusters of blocking issues
     // Topologicaly sorting all issue clusters
     findSubGraphs(graph).forEach(graphIndexes => {
         let fullGraph = issueIdtoIssueObject(graph, graphIndexes);
         sortedSubGraphs.push(topologicalSort(fullGraph));
     });
-    
+
     // Building the graph from the sorted issues indexes
     sortedSubGraphs.forEach(graphIndexes => {
         sortedGraph.push(issueIdtoIssueObject(graph, graphIndexes));
@@ -115,20 +117,20 @@ getGraphClustersValue = (graph) => {
         issuesID.forEach(issueId => {
             issuesDetails.push({id: issueId, points: issuesCluster[issueId].cost, status: issuesCluster[issueId].status})
             // Add the issue const
-            clusterValue += issuesCluster[issueId].priority;
+            clusterValue += issuesCluster[issueId].priority * (issuesCluster[issueId].cost * 0.3);
             clusterCost += issuesCluster[issueId].cost;
             // Add the issue Blockers cost times the status multiplier 
             // to-do : 1.2, done 1.5
             issuesCluster[issueId].blockedBy.forEach(blocker => {
                 if(issuesCluster[blocker].status == 'done') {
                     // Add cost to cluster
-                    clusterValue += (1 + (issuesCluster[blocker].priority * 0.1) * 1.2);
+                    clusterValue += issuesCluster[blocker].cost * 0.5;
                 } else {
-                    clusterValue += (1 + (issuesCluster[blocker].priority * 0.1));
+                    clusterValue += issuesCluster[blocker].cost * 0.3;
                 }
             });
         });
-        issuesClusterDetails.push({details: issuesDetails, value : clusterValue / clusterCost});
+        issuesClusterDetails.push({details: issuesDetails, value : clusterValue});
     });
     return issuesClusterDetails;
 }

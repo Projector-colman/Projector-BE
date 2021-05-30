@@ -100,8 +100,6 @@ router.get('/storypoints', [auth], async (req, res) => {
         }
     });
 
-    console.log(sprint);
-
     // Get all Users
     const sprintUsers = await User_Sprint.findAll(
         {
@@ -384,8 +382,9 @@ router.post('/plan', async (req, res) => {
                 issuesGraph[blocks.id].blocking.push(issue.id);
         })
     });
-
+    
     let issuesClusterDetails = getGraphClustersValue(issuesGraph);
+
     let newAssignees = [];
     while(issuesClusterDetails.length > 0) {
         let mostValueableCluster = findHighestValueCluster(issuesClusterDetails);

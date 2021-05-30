@@ -297,13 +297,25 @@ router.get('/:id/done', auth, async (req, res) => {
             model: Issue,
             where: {
                 status: 'done',
-                sprint : null
+                sprint : {
+                    [Op.gt]: 0
+                }
             },
-            include: {
+            include: [{
                 model: User,
                 as: 'assignee',
                 attributes: ['id', 'name', 'image']
-            }
+            },
+            { 
+                model: Issue,
+                as: 'blockers',
+                attributes: ['name']
+            },
+            { 
+                model: Issue,
+                as: 'blocked',
+                attributes: ['name']
+            }]
         }
     });
 
