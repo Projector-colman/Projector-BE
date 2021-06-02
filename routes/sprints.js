@@ -261,9 +261,16 @@ router.post('/start', auth, async (req, res) => {
         }
     });
 
+    const startDate = new Date();
+    const endDate = new Date();
+
+    endDate.setDate(startDate.getDate() + 14);
+
     if(plannedSprint) {
         await Sprint.update({
-            status : "active"
+            status : "active",
+            startTime: startDate,
+            endTime: endDate
         }, {
             where : {
                 id : plannedSprint.id
