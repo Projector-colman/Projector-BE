@@ -9,6 +9,8 @@ const router = express.Router();
 
 const multer = require('multer');
 const sharp = require('sharp');
+const { Epic } = require('../models/epic');
+const { Project } = require('../models/project');
 
 //multer options
 const upload = multer({
@@ -192,11 +194,18 @@ router.get('/:id/issues/assignee', auth, async (req, res) => {
     const issues = await Issue.findAll({ 
         where: { asignee: user.id },
         order: [[ 'name', 'ASC' ]],
-        include: {
+        include: [{
             model: User,
             as: 'assignee',
             attributes: ['id', 'name', 'image']
-        }
+        },
+        {
+            model: Epic,
+            include: {
+                model: Project,
+                attributes: ['key']
+            }
+        }]
     });
 
     issues.map(issue => issue.User = {id : issue.asignee, name: user.name});
