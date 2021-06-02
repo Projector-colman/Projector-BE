@@ -173,7 +173,7 @@ router.get('/:id/issues', async (req, res) => {
                     include: [{
                         model: User,
                         as: 'assignee',
-                        attributes: ['id', 'name']
+                        attributes: ['id', 'name', 'image']
                     },
                     { 
                         model: Issue,
@@ -234,7 +234,6 @@ router.get('/:id/issues', async (req, res) => {
                     include: [{
                         model: Sprint,
                         attributes: ['status'],
-                        // where: sprintFilter
                     },
                     {
                         model: User,
@@ -264,6 +263,7 @@ router.get('/:id/issues', async (req, res) => {
                 let sprintStatus = issue.Sprint['status'];
                 issue.setDataValue('sprintStatus', sprintStatus);
             }
+            issue.setDataValue('project', +req.params.id);
             issues.push(issue);
         });
     });
@@ -290,7 +290,7 @@ router.get('/:id/done', auth, async (req, res) => {
     let project = await Project.findByPk(req.params.id);
     if (!project) return res.status(400).send('Project does not exist.');
 
-    const issues = await Epic.findAll({
+    const Epics = await Epic.findAll({
         where : {
             project : project.id
         },
@@ -305,7 +305,7 @@ router.get('/:id/done', auth, async (req, res) => {
             include: [{
                 model: User,
                 as: 'assignee',
-                attributes: ['id', 'name', 'image']
+                attributes: ['id', 'name']
             },
             { 
                 model: Issue,
@@ -320,7 +320,12 @@ router.get('/:id/done', auth, async (req, res) => {
         }
     });
 
-    res.status(200).send(issues)
+    Epics.forEach(epic => {
+        epic["Issues"].forEach(issue => {
+            issue.setDataValue('project', +req.params.id);
+        });
+    }) 
+    res.status(200).send(Epics)
 });
 
 router.get('/:id/total', auth, async (req, res) => {
