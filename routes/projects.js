@@ -298,7 +298,9 @@ router.get('/:id/done', auth, async (req, res) => {
             model: Issue,
             where: {
                 status: 'done',
-                sprint : null
+                sprint : {
+                    [Op.gt]: 0
+                }
             },
             include: [{
                 model: User,
