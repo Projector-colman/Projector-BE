@@ -8,6 +8,7 @@ const { Issue } = require('../models/issue');
 const { Sprint } = require('../models/sprint');
 const router = express.Router();
 const { Op } = require('sequelize');
+const db = require('../startup/db');
 
 // Get all projects
 // Everyone can get it.
@@ -297,9 +298,7 @@ router.get('/:id/done', auth, async (req, res) => {
             model: Issue,
             where: {
                 status: 'done',
-                sprint : {
-                    [Op.gt]: 0
-                }
+                sprint : null
             },
             include: [{
                 model: User,
@@ -320,6 +319,14 @@ router.get('/:id/done', auth, async (req, res) => {
     });
 
     res.status(200).send(issues)
+});
+
+router.get('/:id/total', auth, async (req, res) => {
+    let project = await Project.findByPk(req.params.id);
+    if (!project) return res.status(400).send('Project does not exist.');
+
+    const users = await db.query(`select (select name from users where id = asignee), count(*) as "issueCount", SUM("storyPoints") as "totalSP" from issues where epic = any (select id from epics where project = ${req.params.id} ) AND status = 'done' group by asignee`);
+    res.status(200).send(users)
 });
 
 module.exports = router;

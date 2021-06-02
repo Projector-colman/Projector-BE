@@ -78,7 +78,7 @@ router.get('/me', auth, async (req, res) => {
 
 // Get all users:
 // Only Admin can get all the users.
-router.get('/', [ auth, admin ], async (req, res) => {
+router.get('/', auth, async (req, res) => {
     const users = await User.findAll();
     res.send(users);
 });
