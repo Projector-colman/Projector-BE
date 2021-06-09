@@ -391,7 +391,7 @@ router.post('/plan', async (req, res) => {
     });
     
     let issuesClusterDetails = getGraphClustersValue(issuesGraph);
-
+    console.log(issuesClusterDetails);
     let newAssignees = [];
     while(issuesClusterDetails.length > 0) {
         let mostValueableCluster = findHighestValueCluster(issuesClusterDetails);

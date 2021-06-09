@@ -2,7 +2,6 @@ const _ = require('lodash');
 
 topologicalSort = (graph) => {
     let copyGraph = _.cloneDeep(graph);
-
     let roots = []
     let sortedElements = [];
     let isCyclic = false;
@@ -13,12 +12,12 @@ topologicalSort = (graph) => {
         if(copyGraph[node].blockedBy.length == 0) {
             roots.push(node);
         }
-    })
+    });
 
     while (roots.length > 0) {
         let n = +roots.pop();
         sortedElements.push(n);
-        copyGraph[n].blocking.forEach(m => {
+        graph[n].blocking.forEach(m => {
             // Remove vertice (each node saves the vertice)
             copyGraph[n].blocking.splice(copyGraph[n].blocking.indexOf(m), 1)
             copyGraph[m].blockedBy.splice(copyGraph[m].blockedBy.indexOf(n), 1)
@@ -27,7 +26,7 @@ topologicalSort = (graph) => {
             }
         });
     }
-    
+
     nodes.forEach(node => {
         // if there are still vertices then theres a cycle
         if(copyGraph[node].blockedBy.length > 0 || copyGraph[node].blocking.length > 0) {
@@ -69,6 +68,7 @@ findSubGraphs = (graph) => {
         
         subGraphIndex++;
     }
+    
     return subGraphs;
 }
 
@@ -103,7 +103,7 @@ getGraphClustersValue = (graph) => {
         let fullGraph = issueIdtoIssueObject(graph, graphIndexes);
         sortedSubGraphs.push(topologicalSort(fullGraph));
     });
-
+    
     // Building the graph from the sorted issues indexes
     sortedSubGraphs.forEach(graphIndexes => {
         sortedGraph.push(issueIdtoIssueObject(graph, graphIndexes));
